@@ -10,7 +10,6 @@ public class NamHoc {
     private LocalDate ngayKetThuc;
 
     public List<HocKy> layDanhSachHocKy() {
-        // Method implementation will be added later
         return null;
     }
 }

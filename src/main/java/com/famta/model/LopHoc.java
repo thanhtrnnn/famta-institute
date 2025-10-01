@@ -13,11 +13,9 @@ public class LopHoc {
     private TietHoc tietHocKetThuc;
 
     public List<HocSinh> layDanhSachHocSinh() {
-        // Method implementation will be added later
         return null;
     }
 
     public void themDangKy(DangKyHoc dangKyHoc) {
-        // Method implementation will be added later
     }
 }
