@@ -9,6 +9,5 @@ public class NguoiGiamHo {
     private String sdt;
 
     public void guiThongBao(String noiDung) {
-        // Method implementation will be added later
     }
 }

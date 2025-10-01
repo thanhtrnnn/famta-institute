@@ -7,7 +7,6 @@ public class Khoa {
     private String tenKhoa;
 
     public List<MonHoc> layDanhSachMonHoc() {
-        // Method implementation will be added later
         return null;
     }
 }

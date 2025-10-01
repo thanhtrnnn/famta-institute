@@ -15,11 +15,10 @@ public class HocSinh {
     private List<DangKyHoc> quaTrinhHocTap;
 
     public void dangKyLopHoc(LopHoc lopHoc) {
-        // Method implementation will be added later
+        
     }
 
     public List<DiemSo> layBangDiem() {
-        // Method implementation will be added later
         return null;
     }
 }

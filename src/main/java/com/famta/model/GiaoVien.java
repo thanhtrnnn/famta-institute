@@ -13,10 +13,8 @@ public class GiaoVien {
     private List<LopHoc> cacLopDangDay;
 
     public void nhapDiem(DangKyHoc dangKyHoc, DiemSo diem) {
-        // Method implementation will be added later
     }
 
     public void xemLichDay() {
-        // Method implementation will be added later
     }
 }
