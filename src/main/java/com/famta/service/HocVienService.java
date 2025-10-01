@@ -1,6 +1,6 @@
 package com.famta.service;
 
-import com.famta.model.HocVien;
+import com.famta.model.HocSinh;
 import java.util.List;
 
 /**
@@ -12,28 +12,28 @@ public interface HocVienService {
      * Get all students
      * @return List of all students
      */
-    List<HocVien> getAllHocVien();
+    List<HocSinh> getAllHocVien();
     
     /**
      * Get student by ID
      * @param maHocVien Student ID
      * @return Student object or null if not found
      */
-    HocVien getHocVienById(String maHocVien);
+    HocSinh getHocVienById(String maHocVien);
     
     /**
      * Add new student
      * @param hocVien Student to add
      * @return true if successful, false otherwise
      */
-    boolean addHocVien(HocVien hocVien);
+    boolean addHocVien(HocSinh hocVien);
     
     /**
      * Update existing student
      * @param hocVien Student to update
      * @return true if successful, false otherwise
      */
-    boolean updateHocVien(HocVien hocVien);
+    boolean updateHocVien(HocSinh hocVien);
     
     /**
      * Delete student
@@ -47,5 +47,5 @@ public interface HocVienService {
      * @param hoTen Name to search for
      * @return List of matching students
      */
-    List<HocVien> searchHocVienByName(String hoTen);
+    List<HocSinh> searchHocVienByName(String hoTen);
 }
