@@ -1,20 +1,67 @@
 package com.famta.model;
 
-public class PhongHoc {    private String maPhongHoc;
+import java.util.Locale;
+import java.util.Objects;
+
+public class PhongHoc {
+    private final String maPhongHoc;
     private String tenPhongHoc;
-    private LoaiPhongHoc loaiPhongHoc;
+    private String maLoaiPhongHoc;
+    private String tenLoaiPhongHoc;
 
-    // Constructors
-    public PhongHoc() {}
-    public PhongHoc(String maPhongHoc, String tenPhongHoc, LoaiPhongHoc loaiPhongHoc) { this.maPhongHoc = maPhongHoc; this.tenPhongHoc = tenPhongHoc; this.loaiPhongHoc = loaiPhongHoc; }
+    public PhongHoc(String maPhongHoc, String tenPhongHoc, String maLoaiPhongHoc, String tenLoaiPhongHoc) {
+        this.maPhongHoc = Objects.requireNonNull(maPhongHoc, "maPhongHoc");
+        this.tenPhongHoc = tenPhongHoc;
+        this.maLoaiPhongHoc = maLoaiPhongHoc;
+        this.tenLoaiPhongHoc = tenLoaiPhongHoc;
+    }
 
-    // Getters
-    public String getMaPhongHoc() { return maPhongHoc; }
-    public String getTenPhongHoc() { return tenPhongHoc; }
-    public LoaiPhongHoc getLoaiPhongHoc() { return loaiPhongHoc; }
+    public PhongHoc(String maPhongHoc, String tenPhongHoc, LoaiPhongHoc loaiPhongHoc) {
+        this(maPhongHoc, tenPhongHoc,
+                loaiPhongHoc != null ? loaiPhongHoc.name() : null,
+                loaiPhongHoc != null ? dinhDangTenLoai(loaiPhongHoc) : null);
+    }
 
-    // Setters
-    public void setMaPhongHoc(String maPhongHoc) { this.maPhongHoc = maPhongHoc; }
-    public void setTenPhongHoc(String tenPhongHoc) { this.tenPhongHoc = tenPhongHoc; }
-    public void setLoaiPhongHoc(LoaiPhongHoc loaiPhongHoc) { this.loaiPhongHoc = loaiPhongHoc; }
+    public String getMaPhongHoc() {
+        return maPhongHoc;
+    }
+
+    public String getTenPhongHoc() {
+        return tenPhongHoc;
+    }
+
+    public void setTenPhongHoc(String tenPhongHoc) {
+        this.tenPhongHoc = tenPhongHoc;
+    }
+
+    public String getMaLoaiPhongHoc() {
+        return maLoaiPhongHoc;
+    }
+
+    public void setMaLoaiPhongHoc(String maLoaiPhongHoc) {
+        this.maLoaiPhongHoc = maLoaiPhongHoc;
+    }
+
+    public String getTenLoaiPhongHoc() {
+        return tenLoaiPhongHoc;
+    }
+
+    public void setTenLoaiPhongHoc(String tenLoaiPhongHoc) {
+        this.tenLoaiPhongHoc = tenLoaiPhongHoc;
+    }
+
+    public void setLoaiPhongHoc(LoaiPhongHoc loaiPhongHoc) {
+        if (loaiPhongHoc == null) {
+            this.maLoaiPhongHoc = null;
+            this.tenLoaiPhongHoc = null;
+        } else {
+            this.maLoaiPhongHoc = loaiPhongHoc.name();
+            this.tenLoaiPhongHoc = dinhDangTenLoai(loaiPhongHoc);
+        }
+    }
+
+    private static String dinhDangTenLoai(LoaiPhongHoc loai) {
+        String lower = loai.name().toLowerCase(Locale.ROOT).replace('_', ' ');
+        return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
+    }
 }

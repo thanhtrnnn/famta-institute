@@ -1,20 +1,41 @@
 package com.famta.model;
 
-public class MonHoc {    private String maMonHoc;
+import java.util.Objects;
+
+public class MonHoc {
+    private final String maMonHoc;
     private String tenMonHoc;
     private Khoa khoa;
 
-    // Constructors
-    public MonHoc() {}
-    public MonHoc(String maMonHoc, String tenMonHoc, Khoa khoa) { this.maMonHoc = maMonHoc; this.tenMonHoc = tenMonHoc; this.khoa = khoa; }
+    public MonHoc(String maMonHoc, String tenMonHoc, Khoa khoa) {
+        this.maMonHoc = Objects.requireNonNull(maMonHoc, "maMonHoc");
+        this.tenMonHoc = tenMonHoc;
+        setKhoa(khoa);
+    }
 
-    // Getters
-    public String getMaMonHoc() { return maMonHoc; }
-    public String getTenMonHoc() { return tenMonHoc; }
-    public Khoa getKhoa() { return khoa; }
+    public String getMaMonHoc() {
+        return maMonHoc;
+    }
 
-    // Setters
-    public void setMaMonHoc(String maMonHoc) { this.maMonHoc = maMonHoc; }
-    public void setTenMonHoc(String tenMonHoc) { this.tenMonHoc = tenMonHoc; }
-    public void setKhoa(Khoa khoa) { this.khoa = khoa; }
+    public String getTenMonHoc() {
+        return tenMonHoc;
+    }
+
+    public void setTenMonHoc(String tenMonHoc) {
+        this.tenMonHoc = tenMonHoc;
+    }
+
+    public Khoa getKhoa() {
+        return khoa;
+    }
+
+    public void setKhoa(Khoa khoa) {
+        if (this.khoa != null) {
+            this.khoa.xoaMonHocInternal(this);
+        }
+        this.khoa = khoa;
+        if (khoa != null) {
+            khoa.themMonHocInternal(this);
+        }
+    }
 }
