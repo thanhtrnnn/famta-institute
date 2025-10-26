@@ -1,0 +1,152 @@
+---
+config:
+  look: neo
+  theme: base
+  layout: elk
+---
+classDiagram
+direction TB
+    class TaiKhoan {
+	    +string TenDangNhap
+	    -string MatKhauHash
+	    +QuyenTruyCap Quyen
+	    +dangNhap(matKhau: string) : bool
+	    +doiMatKhau(matKhauCu: string, matKhauMoi: string) : void
+	    +kiemTraQuyen(quyenCanKiemTra: QuyenTruyCap) : bool
+    }
+    class QuyenTruyCap {
+	    ADMIN
+	    GIAO_VU
+	    GIAO_VIEN
+	    KE_TOAN
+	    HOC_VIEN
+	    PHU_HUYNH
+    }
+    class BaoCaoThongKe {
+	    +taoBaoCaoDanhSachHocVien(danhSachLop: List~LopHoc~) : string
+	    +xuatBangDiemLop(lopHoc: LopHoc) : string
+	    +thongKeHocVienMoi(danhSachHocVien: List~HocSinh~, tuNgay: DateTime, denNgay: DateTime) : string
+	    +thongKeHocVienXuatSac(danhSachDangKy: List~DangKyHoc~, dieuKienDiem: float) : string
+    }
+    class HocSinh {
+	    +string MaHocSinh
+	    +string Ho, TenLot, Ten
+	    +DateTime NgaySinh, NgayNhapHoc
+	    +string GioiTinh
+	    +TaiKhoan TaiKhoan
+	    +List~MoiQuanHeGiamHo~ DanhSachGiamHo
+	    +List~DangKyHoc~ QuaTrinhHocTap
+	    +dangKyLopHoc(lopHoc: LopHoc, khoi: Khoi) : void
+	    +layBangDiem() : List~DangKyHoc~
+	    +xemLichHoc() : string
+    }
+    class GiaoVien {
+	    +string MaGiaoVien
+	    +string Ho, TenLot, Ten
+	    +string GioiTinh
+	    +string DiaChiEmail, SDT
+	    +TaiKhoan TaiKhoan
+	    +List~LopHoc~ CacLopDangDay
+	    +nhapDiem(dangKyHoc: DangKyHoc, diemSo: float) : void
+	    +xemLichDay() : string
+	    +diemDanh(lopHoc: LopHoc, hocSinh: HocSinh, trangThai: string) : void
+    }
+    class NguoiGiamHo {
+	    +string MaNguoiGiamHo
+	    +string Ho, TenLot, Ten
+	    +string DiaChiEmail, SDT
+	    +TaiKhoan TaiKhoan
+	    +guiThongBao(noiDung: string) : void
+	    +guiNhacNhoHocPhi() : void
+    }
+	class LoaiNguoiGiamHo {
+		CHA,
+		ME,
+		ONG,
+		BA,
+		ANH,
+		CHI,
+		KHAC
+	}
+    class MoiQuanHeGiamHo {
+	    +NguoiGiamHo NguoiGiamHo
+	    +LoaiNguoiGiamHo LoaiNguoiGiamHo
+    }
+    class LopHoc {
+	    +string MaLopHoc, TenLopHoc
+	    +MonHoc MonHoc
+	    +GiaoVien GiaoVienPhuTrach
+	    +HocKy HocKy
+	    +PhongHoc PhongHoc
+	    +TietHoc TietHocBatDau, TietHocKetThuc
+	    +List~DangKyHoc~ DanhSachDangKy
+	    +themHocSinh(hocSinh: HocSinh, khoi: Khoi) : void
+	    +layDanhSachHocSinh() : List~HocSinh~
+    }
+    class DangKyHoc {
+	    +HocSinh HocSinh
+	    +LopHoc LopHoc
+	    +Khoi Khoi
+	    +float DiemSo
+	    +capNhatDiem(diemMoi: float) : void
+    }
+    class MonHoc {
+	    +string MaMonHoc, TenMonHoc
+	    +Khoa Khoa
+    }
+    class Khoa {
+	    +string MaKhoa, TenKhoa
+	    +List~MonHoc~ DanhSachMonHoc
+	    +layDanhSachMonHoc() : List~MonHoc~
+    }
+    class NamHoc {
+	    +string MaNamHoc, TenNamHoc
+	    +DateTime NgayBatDau, NgayKetThuc
+	    +List~HocKy~ DanhSachHocKy
+	    +List~TietHoc~ KhungGioTietHoc
+    }
+    class HocKy {
+	    +string MaHocKy
+	    +int ThuTuKy
+	    +DateTime NgayBatDau, NgayKetThuc
+	    +NamHoc NamHoc
+    }
+    class TietHoc {
+	    +string MaTietHoc, TenTietHoc
+	    +TimeSpan ThoiGianBatDau, ThoiGianKetThuc
+	    +NamHoc NamHoc
+    }
+    class PhongHoc {
+	    +string MaPhongHoc, TenPhongHoc
+	    +string MaLoaiPhongHoc
+	    +string TenLoaiPhongHoc
+    }
+    class Khoi {
+	    +string MaKhoi, TenKhoi
+	    +int SoThuTu
+    }
+
+	<<enumeration>> QuyenTruyCap
+	<<enumeration>> LoaiNguoiGiamHo
+
+    TaiKhoan -- QuyenTruyCap
+    HocSinh "1" -- "1" TaiKhoan : co
+    GiaoVien "1" -- "1" TaiKhoan : co
+    NguoiGiamHo "1" -- "1" TaiKhoan : co
+    HocSinh "1" *-- "0..*" MoiQuanHeGiamHo : chua
+    NguoiGiamHo "1" -- "0..*" MoiQuanHeGiamHo : la
+	MoiQuanHeGiamHo -- LoaiNguoiGiamHo
+    HocSinh "1" *-- "0..*" DangKyHoc : co
+    LopHoc "1" *-- "0..*" DangKyHoc : co
+    DangKyHoc "0..*" -- "1" Khoi : thuoc
+    GiaoVien "1" o-- "0..*" LopHoc : phuTrach
+    LopHoc "0..*" -- "1" MonHoc : laMon
+    LopHoc "0..*" -- "1" HocKy : toChucTrong
+    LopHoc "0..*" -- "1" PhongHoc : hocTai
+    LopHoc -- TietHoc : coGioHoc
+    Khoa "1" o-- "0..*" MonHoc : quanLy
+    NamHoc "1" *-- "1..*" HocKy : baoGom
+    NamHoc "1" *-- "0..*" TietHoc : dinhNghia
+    BaoCaoThongKe ..> HocSinh : suDung
+    BaoCaoThongKe ..> LopHoc : suDung
+    BaoCaoThongKe ..> DangKyHoc : suDung
