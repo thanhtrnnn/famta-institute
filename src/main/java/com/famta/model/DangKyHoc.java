@@ -1,26 +1,43 @@
 package com.famta.model;
 
-import java.time.LocalDate;
+import java.util.Objects;
 
-public class DangKyHoc {    
-    private String maDangKy;
-    private HocSinh hocSinh;
-    private LopHoc lopHoc;
-    private LocalDate ngayDangKy;
+public class DangKyHoc {
+    private final HocSinh hocSinh;
+    private final LopHoc lopHoc;
+    private final Khoi khoi;
+    private float diemSo;
 
-    // Constructors
-    public DangKyHoc() {}
-    public DangKyHoc(String maDangKy, HocSinh hocSinh, LopHoc lopHoc, LocalDate ngayDangKy) { this.maDangKy = maDangKy; this.hocSinh = hocSinh; this.lopHoc = lopHoc; this.ngayDangKy = ngayDangKy; }
+    public DangKyHoc(HocSinh hocSinh, LopHoc lopHoc, Khoi khoi) {
+        this.hocSinh = Objects.requireNonNull(hocSinh, "hocSinh");
+        this.lopHoc = Objects.requireNonNull(lopHoc, "lopHoc");
+        this.khoi = Objects.requireNonNull(khoi, "khoi");
+        hocSinh.addDangKyInternal(this);
+        lopHoc.themDangKyNoCascade(this);
+    }
 
-    // Getters
-    public String getMaDangKy() { return maDangKy; }
-    public HocSinh getHocSinh() { return hocSinh; }
-    public LopHoc getLopHoc() { return lopHoc; }
-    public LocalDate getNgayDangKy() { return ngayDangKy; }
+    public HocSinh getHocSinh() {
+        return hocSinh;
+    }
 
-    // Setters
-    public void setMaDangKy(String maDangKy) { this.maDangKy = maDangKy; }
-    public void setHocSinh(HocSinh hocSinh) { this.hocSinh = hocSinh; }
-    public void setLopHoc(LopHoc lopHoc) { this.lopHoc = lopHoc; }
-    public void setNgayDangKy(LocalDate ngayDangKy) { this.ngayDangKy = ngayDangKy; }
+    public LopHoc getLopHoc() {
+        return lopHoc;
+    }
+
+    public Khoi getKhoi() {
+        return khoi;
+    }
+
+    public float getDiemSo() {
+        return diemSo;
+    }
+
+    public void capNhatDiem(float diemMoi) {
+        this.diemSo = diemMoi;
+    }
+
+    void huyDangKy() {
+        lopHoc.xoaDangKyNoCascade(this);
+        hocSinh.removeDangKyInternal(this);
+    }
 }

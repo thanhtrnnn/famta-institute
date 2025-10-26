@@ -1,17 +1,27 @@
 package com.famta.model;
 
-public class MoiQuanHeGiamHo {    private NguoiGiamHo nguoiGiamHo;
-    private LoaiNguoiGiamHo loaiNguoiGiamHo;
+import java.util.Objects;
 
-    // Constructors
-    public MoiQuanHeGiamHo() {}
-    public MoiQuanHeGiamHo(NguoiGiamHo nguoiGiamHo, LoaiNguoiGiamHo loaiNguoiGiamHo) { this.nguoiGiamHo = nguoiGiamHo; this.loaiNguoiGiamHo = loaiNguoiGiamHo; }
+public class MoiQuanHeGiamHo {
+    private final HocSinh hocSinh;
+    private final NguoiGiamHo nguoiGiamHo;
+    private final LoaiNguoiGiamHo loaiNguoiGiamHo;
 
-    // Getters
-    public NguoiGiamHo getNguoiGiamHo() { return nguoiGiamHo; }
-    public LoaiNguoiGiamHo getLoaiNguoiGiamHo() { return loaiNguoiGiamHo; }
+    public MoiQuanHeGiamHo(HocSinh hocSinh, NguoiGiamHo nguoiGiamHo, LoaiNguoiGiamHo loaiNguoiGiamHo) {
+        this.hocSinh = Objects.requireNonNull(hocSinh, "hocSinh");
+        this.nguoiGiamHo = Objects.requireNonNull(nguoiGiamHo, "nguoiGiamHo");
+        this.loaiNguoiGiamHo = Objects.requireNonNull(loaiNguoiGiamHo, "loaiNguoiGiamHo");
+    }
 
-    // Setters
-    public void setNguoiGiamHo(NguoiGiamHo nguoiGiamHo) { this.nguoiGiamHo = nguoiGiamHo; }
-    public void setLoaiNguoiGiamHo(LoaiNguoiGiamHo loaiNguoiGiamHo) { this.loaiNguoiGiamHo = loaiNguoiGiamHo; }
+    public HocSinh getHocSinh() {
+        return hocSinh;
+    }
+
+    public NguoiGiamHo getNguoiGiamHo() {
+        return nguoiGiamHo;
+    }
+
+    public LoaiNguoiGiamHo getLoaiNguoiGiamHo() {
+        return loaiNguoiGiamHo;
+    }
 }
