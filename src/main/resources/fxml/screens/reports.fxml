@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" alignment="TOP_LEFT" spacing="18.0" styleClass="view-container" fx:controller="com.famta.controller.ReportsController">
+   <children>
+      <Label text="Báo cáo &amp; Thống kê" styleClass="view-title" />
+      <HBox alignment="CENTER_LEFT" spacing="10.0">
+         <children>
+            <ComboBox fx:id="reportCombo" prefWidth="180.0" promptText="Chọn báo cáo" />
+            <DatePicker fx:id="fromDatePicker" promptText="Từ ngày" />
+            <DatePicker fx:id="toDatePicker" promptText="Đến ngày" />
+            <ComboBox fx:id="unitCombo" prefWidth="160.0" promptText="Đơn vị" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <Button fx:id="filterButton" mnemonicParsing="false" text="Lọc dữ liệu" onAction="#handleRefresh" />
+            <Button fx:id="exportButton" mnemonicParsing="false" text="Xuất PDF" disable="true" />
+            <Button fx:id="scheduleButton" mnemonicParsing="false" text="Lên lịch email" disable="true" />
+         </children>
+      </HBox>
+      <VBox spacing="12.0" VBox.vgrow="ALWAYS">
+         <children>
+            <Label text="Tổng quan chỉ số" styleClass="section-title" />
+            <HBox spacing="12.0" styleClass="stat-grid">
+               <children>
+                  <VBox styleClass="stat-card" spacing="4.0">
+                     <children>
+                         <Label text="Tổng học viên" styleClass="card-title" />
+                        <Label fx:id="studentValue" text="--" styleClass="card-value" />
+                     </children>
+                  </VBox>
+                  <VBox styleClass="stat-card" spacing="4.0">
+                     <children>
+                        <Label text="Điểm trung bình" styleClass="card-title" />
+                        <Label fx:id="averageScoreValue" text="--" styleClass="card-value" />
+                     </children>
+                  </VBox>
+                  <VBox styleClass="stat-card" spacing="4.0">
+                     <children>
+                         <Label text="Giáo viên đang giảng dạy" styleClass="card-title" />
+                        <Label fx:id="teacherValue" text="--" styleClass="card-value" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <VBox spacing="10.0" styleClass="chart-placeholder" VBox.vgrow="ALWAYS">
+               <children>
+                  <Label text="Biểu đồ" styleClass="section-title" />
+                  <Label fx:id="chartDescription" wrapText="true" text="Khu vực hiển thị biểu đồ đường/cột cho báo cáo được chọn." />
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+   </children>
+   <padding>
+      <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+   </padding>
+</VBox>

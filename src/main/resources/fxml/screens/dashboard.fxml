@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" alignment="TOP_LEFT" spacing="18.0" styleClass="view-container" fx:controller="com.famta.controller.DashboardController">
+   <children>
+      <Label text="Tổng quan" styleClass="view-title" />
+      <HBox spacing="12.0" styleClass="stat-grid">
+         <children>
+            <VBox styleClass="stat-card" spacing="4.0">
+               <Label text="Tổng số học viên" styleClass="card-title" />
+               <Label fx:id="totalStudentsValue" text="--" styleClass="card-value" />
+               <Label fx:id="studentsMetaLabel" text="Đang tải dữ liệu" styleClass="card-meta" />
+            </VBox>
+            <VBox styleClass="stat-card" spacing="4.0">
+               <Label text="Giáo viên hoạt động" styleClass="card-title" />
+               <Label fx:id="activeTeachersValue" text="--" styleClass="card-value" />
+               <Label fx:id="teachersMetaLabel" text="Bao gồm giáo viên thỉnh giảng" styleClass="card-meta" />
+            </VBox>
+            <VBox styleClass="stat-card" spacing="4.0">
+               <Label text="Lớp đang diễn ra" styleClass="card-title" />
+               <Label fx:id="runningClassesValue" text="--" styleClass="card-value" />
+               <Label fx:id="classesMetaLabel" text="Trong tuần này" styleClass="card-meta" />
+            </VBox>
+         </children>
+      </HBox>
+      <HBox alignment="TOP_LEFT" spacing="16.0">
+         <children>
+            <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+               <Label text="Thông báo gần đây" styleClass="section-title" />
+               <ListView fx:id="announcementsList" prefHeight="220.0">
+                  <placeholder>
+                     <Label text="Chưa có thông báo nào" />
+                  </placeholder>
+               </ListView>
+            </VBox>
+            <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+               <Label text="Lịch giảng dạy trong ngày" styleClass="section-title" />
+               <ListView fx:id="scheduleList" prefHeight="220.0">
+                  <placeholder>
+                     <Label text="Không có lớp học" />
+                  </placeholder>
+               </ListView>
+            </VBox>
+         </children>
+      </HBox>
+      <Pane VBox.vgrow="ALWAYS" />
+   </children>
+   <padding>
+      <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+   </padding>
+</VBox>
