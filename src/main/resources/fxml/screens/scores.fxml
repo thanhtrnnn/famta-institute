@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" alignment="TOP_LEFT" spacing="18.0" styleClass="view-container">
+   <children>
+      <Label text="Nhập điểm" styleClass="view-title" />
+      <HBox alignment="CENTER_LEFT" spacing="10.0">
+         <children>
+            <ComboBox prefWidth="200.0" promptText="Chọn lớp" />
+            <ComboBox prefWidth="180.0" promptText="Môn học" />
+            <ComboBox prefWidth="160.0" promptText="Loại điểm" />
+            <TextField promptText="Lọc theo tên học viên" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <Button mnemonicParsing="false" text="Tải mẫu" />
+         </children>
+      </HBox>
+      <TableView editable="true" prefHeight="360.0" VBox.vgrow="ALWAYS">
+         <columns>
+            <TableColumn prefWidth="160.0" text="Mã học viên" />
+            <TableColumn prefWidth="240.0" text="Họ và tên" />
+            <TableColumn prefWidth="160.0" text="Điểm thường xuyên" />
+            <TableColumn prefWidth="160.0" text="Điểm giữa kỳ" />
+            <TableColumn prefWidth="160.0" text="Điểm cuối kỳ" />
+         </columns>
+      </TableView>
+      <HBox alignment="CENTER_RIGHT" spacing="10.0">
+         <children>
+            <Button mnemonicParsing="false" text="Lưu nháp" />
+            <Button mnemonicParsing="false" text="Xác nhận" />
+         </children>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+   </padding>
+</VBox>

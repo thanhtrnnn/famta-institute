@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" alignment="TOP_LEFT" spacing="16.0" styleClass="view-container" fx:controller="com.famta.controller.StudentManagementController">
+   <children>
+      <HBox alignment="CENTER_LEFT" spacing="12.0">
+         <children>
+            <Label text="Quản lý học viên" styleClass="view-title" />
+            <Label fx:id="resultsSummary" styleClass="badge" text="" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <Button fx:id="addStudentButton" mnemonicParsing="false" onAction="#handleAddStudent" text="Thêm học viên" />
+            <Button mnemonicParsing="false" onAction="#handleImportCsv" styleClass="secondary" text="Nhập CSV" />
+            <Button mnemonicParsing="false" onAction="#handleExportList" styleClass="secondary" text="Xuất danh sách" />
+         </children>
+      </HBox>
+      <VBox spacing="12.0">
+         <children>
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+               <children>
+                  <TextField fx:id="searchField" promptText="Tìm kiếm theo tên hoặc mã học viên" />
+                  <ComboBox fx:id="genderFilter" prefWidth="140.0" promptText="Giới tính" />
+                  <ComboBox fx:id="enrollmentYearFilter" prefWidth="140.0" promptText="Năm nhập học" />
+                  <Button fx:id="resetButton" mnemonicParsing="false" onAction="#handleResetFilters" text="Đặt lại" />
+               </children>
+            </HBox>
+            <TableView fx:id="studentTable" prefHeight="400.0" VBox.vgrow="ALWAYS">
+               <columns>
+                  <TableColumn fx:id="idColumn" prefWidth="120.0" text="Mã học viên" />
+                  <TableColumn fx:id="fullNameColumn" prefWidth="220.0" text="Họ và tên" />
+                  <TableColumn fx:id="genderColumn" prefWidth="120.0" text="Giới tính" />
+                  <TableColumn fx:id="birthDateColumn" prefWidth="150.0" text="Ngày sinh" />
+                  <TableColumn fx:id="enrollDateColumn" prefWidth="150.0" text="Ngày nhập học" />
+               </columns>
+            </TableView>
+            <Label fx:id="placeholderMessage" styleClass="info-text" wrapText="true" />
+         </children>
+      </VBox>
+   </children>
+   <padding>
+      <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+   </padding>
+</VBox>
