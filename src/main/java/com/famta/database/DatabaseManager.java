@@ -58,6 +58,7 @@ public class DatabaseManager {
         validateConfiguration();
         connect();
         initializeSchemaIfNeeded();
+        ensureAccountTable();
     }
 
     public static synchronized DatabaseManager getInstance() {
@@ -122,6 +123,25 @@ public class DatabaseManager {
     public synchronized void initializeSchemaIfNeeded() {
         if (!tableExists(healthCheckTable)) {
             executeDocScript(SCHEMA_SCRIPT);
+        }
+    }
+
+    private void ensureAccountTable() {
+        if (tableExists("TAIKHOAN")) {
+            return;
+        }
+        String createSql = """
+            CREATE TABLE TAIKHOAN(
+                TenDangNhap NVARCHAR(50) PRIMARY KEY,
+                MatKhauHash NVARCHAR(88) NOT NULL,
+                Quyen       NVARCHAR(20) NOT NULL
+            )
+            """;
+        try (Statement statement = getConnection().createStatement()) {
+            statement.execute(createSql);
+            System.out.println("Created TAIKHOAN table for authentication module.");
+        } catch (SQLException ex) {
+            throw new IllegalStateException("Unable to create TAIKHOAN table", ex);
         }
     }
 
