@@ -95,8 +95,8 @@ public class GiaoVien {
         return ho + " " + (tenLot != null && !tenLot.isBlank() ? tenLot + " " : "") + ten;
     }
 
-    public void nhapDiem(DangKyHoc dangKyHoc, float diemSo) {
-        Objects.requireNonNull(dangKyHoc, "dangKyHoc").capNhatDiem(diemSo);
+    public void nhapDiem(DangKyHoc dangKyHoc, Float tx, Float gk, Float ck) {
+        Objects.requireNonNull(dangKyHoc, "dangKyHoc").capNhatDiem(tx, gk, ck);
     }
 
     public String xemLichDay() {

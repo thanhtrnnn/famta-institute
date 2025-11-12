@@ -18,8 +18,8 @@ public class PhongHoc {
 
     public PhongHoc(String maPhongHoc, String tenPhongHoc, LoaiPhongHoc loaiPhongHoc) {
         this(maPhongHoc, tenPhongHoc,
-                loaiPhongHoc != null ? loaiPhongHoc.name() : null,
-                loaiPhongHoc != null ? dinhDangTenLoai(loaiPhongHoc) : null);
+                loaiPhongHoc != null ? loaiPhongHoc.getMaLoaiPhongHoc() : null,
+                loaiPhongHoc != null ? loaiPhongHoc.getTenLoaiPhongHoc() : null);
     }
 
     public String getMaPhongHoc() {
@@ -55,13 +55,8 @@ public class PhongHoc {
             this.maLoaiPhongHoc = null;
             this.tenLoaiPhongHoc = null;
         } else {
-            this.maLoaiPhongHoc = loaiPhongHoc.name();
-            this.tenLoaiPhongHoc = dinhDangTenLoai(loaiPhongHoc);
+            this.maLoaiPhongHoc = loaiPhongHoc.getMaLoaiPhongHoc();
+            this.tenLoaiPhongHoc = loaiPhongHoc.getTenLoaiPhongHoc();
         }
-    }
-
-    private static String dinhDangTenLoai(LoaiPhongHoc loai) {
-        String lower = loai.name().toLowerCase(Locale.ROOT).replace('_', ' ');
-        return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
     }
 }

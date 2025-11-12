@@ -12,9 +12,17 @@ public class TaiKhoan {
     private QuyenTruyCap quyen;
 
     public TaiKhoan(String tenDangNhap, String matKhau, QuyenTruyCap quyen) {
+        this(tenDangNhap, quyen, hash(Objects.requireNonNull(matKhau, "matKhau")));
+    }
+
+    private TaiKhoan(String tenDangNhap, QuyenTruyCap quyen, String matKhauHash) {
         this.tenDangNhap = Objects.requireNonNull(tenDangNhap, "tenDangNhap");
         this.quyen = Objects.requireNonNull(quyen, "quyen");
-        setMatKhau(matKhau);
+        this.matKhauHash = Objects.requireNonNull(matKhauHash, "matKhauHash");
+    }
+
+    public static TaiKhoan fromHash(String tenDangNhap, String matKhauHash, QuyenTruyCap quyen) {
+        return new TaiKhoan(tenDangNhap, quyen, matKhauHash);
     }
 
     public String getTenDangNhap() {
@@ -45,11 +53,15 @@ public class TaiKhoan {
         return quyen == quyenCanKiemTra;
     }
 
+    public String getMatKhauHash() {
+        return matKhauHash;
+    }
+
     private void setMatKhau(String matKhauMoi) {
         this.matKhauHash = hash(Objects.requireNonNull(matKhauMoi, "matKhauMoi"));
     }
 
-    private String hash(String value) {
+    public static String hash(String value) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hashed = digest.digest(value.getBytes(StandardCharsets.UTF_8));
