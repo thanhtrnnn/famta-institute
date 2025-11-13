@@ -7,23 +7,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class HocSinh {
+public class HocSinh extends NguoiDung {
     private final String maHocSinh;
-    private String ho;
-    private String tenLot;
-    private String ten;
     private LocalDate ngaySinh;
     private LocalDate ngayNhapHoc;
     private String gioiTinh;
-    private TaiKhoan taiKhoan;
     private final List<MoiQuanHeGiamHo> danhSachGiamHo = new ArrayList<>();
     private final List<DangKyHoc> quaTrinhHocTap = new ArrayList<>();
 
     public HocSinh(String maHocSinh, String ho, String tenLot, String ten, LocalDate ngaySinh, String gioiTinh, LocalDate ngayNhapHoc) {
+        super(ho, tenLot, ten);
         this.maHocSinh = Objects.requireNonNull(maHocSinh, "maHocSinh");
-        this.ho = ho;
-        this.tenLot = tenLot;
-        this.ten = ten;
         this.ngaySinh = ngaySinh;
         this.gioiTinh = gioiTinh;
         this.ngayNhapHoc = ngayNhapHoc;
@@ -31,30 +25,6 @@ public class HocSinh {
 
     public String getMaHocSinh() {
         return maHocSinh;
-    }
-
-    public String getHo() {
-        return ho;
-    }
-
-    public void setHo(String ho) {
-        this.ho = ho;
-    }
-
-    public String getTenLot() {
-        return tenLot;
-    }
-
-    public void setTenLot(String tenLot) {
-        this.tenLot = tenLot;
-    }
-
-    public String getTen() {
-        return ten;
-    }
-
-    public void setTen(String ten) {
-        this.ten = ten;
     }
 
     public LocalDate getNgaySinh() {
@@ -81,24 +51,12 @@ public class HocSinh {
         this.gioiTinh = gioiTinh;
     }
 
-    public TaiKhoan getTaiKhoan() {
-        return taiKhoan;
-    }
-
-    public void setTaiKhoan(TaiKhoan taiKhoan) {
-        this.taiKhoan = taiKhoan;
-    }
-
     public List<MoiQuanHeGiamHo> getDanhSachNguoiGiamHo() {
         return Collections.unmodifiableList(danhSachGiamHo);
     }
 
     public List<DangKyHoc> getQuaTrinhHocTap() {
         return Collections.unmodifiableList(quaTrinhHocTap);
-    }
-
-    public String getHoTenDayDu() {
-        return ho + " " + (tenLot != null && !tenLot.isBlank() ? tenLot + " " : "") + ten;
     }
 
     public void themMoiQuanHeGiamHo(NguoiGiamHo nguoiGiamHo, LoaiNguoiGiamHo loaiNguoiGiamHo) {
