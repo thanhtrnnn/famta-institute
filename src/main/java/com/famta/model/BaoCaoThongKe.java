@@ -28,7 +28,10 @@ public class BaoCaoThongKe {
         for (DangKyHoc dangKyHoc : lopHoc.getDanhSachDangKy()) {
             builder.append("- ").append(dangKyHoc.getHocSinh().getHoTenDayDu())
                     .append(" (" + dangKyHoc.getHocSinh().getMaHocSinh() + ")")
-                    .append(": ").append(dangKyHoc.getDiemSo()).append('\n');
+                    .append(": TX=").append(dangKyHoc.getDiemThuongXuyen())
+                    .append(", GK=").append(dangKyHoc.getDiemGiuaKy())
+                    .append(", CK=").append(dangKyHoc.getDiemCuoiKy())
+                    .append(" => Tong: ").append(dangKyHoc.getDiemTongKet()).append('\n');
         }
         return builder.toString();
     }
@@ -48,9 +51,9 @@ public class BaoCaoThongKe {
     public String thongKeHocVienXuatSac(List<DangKyHoc> danhSachDangKy, float dieuKienDiem) {
         Objects.requireNonNull(danhSachDangKy, "danhSachDangKy");
         return danhSachDangKy.stream()
-                .filter(dk -> dk.getDiemSo() >= dieuKienDiem)
+                .filter(dk -> dk.getDiemTongKet() >= dieuKienDiem)
                 .sorted(Comparator.comparing(dk -> dk.getHocSinh().getHoTenDayDu()))
-                .map(dk -> dk.getHocSinh().getHoTenDayDu() + " - " + dk.getDiemSo())
+                .map(dk -> dk.getHocSinh().getHoTenDayDu() + " - " + dk.getDiemTongKet())
                 .collect(Collectors.joining("\n", "Hoc vien xuat sac:\n", ""));
     }
 }
