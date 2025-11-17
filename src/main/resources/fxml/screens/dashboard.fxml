@@ -34,7 +34,7 @@
          <children>
             <VBox spacing="10.0" VBox.vgrow="ALWAYS">
                <Label text="Thông báo gần đây" styleClass="section-title" />
-               <ListView fx:id="announcementsList" prefHeight="220.0">
+               <ListView fx:id="announcementsList" prefHeight="220.0" prefWidth="300.0">
                   <placeholder>
                      <Label text="Chưa có thông báo nào" />
                   </placeholder>
@@ -42,7 +42,7 @@
             </VBox>
             <VBox spacing="10.0" VBox.vgrow="ALWAYS">
                <Label text="Lịch giảng dạy trong ngày" styleClass="section-title" />
-               <ListView fx:id="scheduleList" prefHeight="220.0">
+               <ListView fx:id="scheduleList" prefHeight="220.0" prefWidth="300.0">
                   <placeholder>
                      <Label text="Không có lớp học" />
                   </placeholder>
