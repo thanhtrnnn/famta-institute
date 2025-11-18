@@ -35,6 +35,9 @@
                </children>
             </HBox>
             <TableView fx:id="studentTable" prefHeight="400.0" VBox.vgrow="ALWAYS">
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
                <columns>
                   <TableColumn fx:id="idColumn" prefWidth="120.0" text="Mã học viên" />
                   <TableColumn fx:id="fullNameColumn" prefWidth="220.0" text="Họ và tên" />

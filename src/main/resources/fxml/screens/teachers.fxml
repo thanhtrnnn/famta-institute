@@ -19,9 +19,15 @@
         <Pane HBox.hgrow="ALWAYS" />
         <TextField fx:id="searchField" promptText="Tìm kiếm theo tên hoặc mã" HBox.hgrow="ALWAYS" />
         <Button mnemonicParsing="false" onAction="#handleRefresh" text="Tải lại" />
+        <Button mnemonicParsing="false" onAction="#handleAdd" text="Thêm mới" />
+        <Button mnemonicParsing="false" onAction="#handleEdit" text="Sửa" />
+        <Button mnemonicParsing="false" onAction="#handleDelete" text="Xóa" />
       </children>
     </HBox>
     <TableView fx:id="teacherTable" prefHeight="420.0" VBox.vgrow="ALWAYS">
+      <columnResizePolicy>
+        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+      </columnResizePolicy>
       <columns>
         <TableColumn fx:id="colId" prefWidth="140.0" text="Mã giáo viên" />
         <TableColumn fx:id="colFullName" prefWidth="260.0" text="Họ và tên" />
