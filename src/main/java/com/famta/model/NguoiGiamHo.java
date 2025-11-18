@@ -5,51 +5,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class NguoiGiamHo {
+public class NguoiGiamHo extends NguoiDung {
     private final String maNguoiGiamHo;
-    private String ho;
-    private String tenLot;
-    private String ten;
     private String diaChiEmail;
     private String sdt;
-    private TaiKhoan taiKhoan;
     private final List<MoiQuanHeGiamHo> quanHeVoiHocSinh = new ArrayList<>();
 
     public NguoiGiamHo(String maNguoiGiamHo, String ho, String tenLot, String ten, String diaChiEmail, String sdt) {
+        super(ho, tenLot, ten);
         this.maNguoiGiamHo = Objects.requireNonNull(maNguoiGiamHo, "maNguoiGiamHo");
-        this.ho = ho;
-        this.tenLot = tenLot;
-        this.ten = ten;
         this.diaChiEmail = diaChiEmail;
         this.sdt = sdt;
     }
 
     public String getMaNguoiGiamHo() {
         return maNguoiGiamHo;
-    }
-
-    public String getHo() {
-        return ho;
-    }
-
-    public void setHo(String ho) {
-        this.ho = ho;
-    }
-
-    public String getTenLot() {
-        return tenLot;
-    }
-
-    public void setTenLot(String tenLot) {
-        this.tenLot = tenLot;
-    }
-
-    public String getTen() {
-        return ten;
-    }
-
-    public void setTen(String ten) {
-        this.ten = ten;
     }
 
     public String getDiaChiEmail() {
@@ -68,20 +38,8 @@ public class NguoiGiamHo {
         this.sdt = sdt;
     }
 
-    public TaiKhoan getTaiKhoan() {
-        return taiKhoan;
-    }
-
-    public void setTaiKhoan(TaiKhoan taiKhoan) {
-        this.taiKhoan = taiKhoan;
-    }
-
     public List<MoiQuanHeGiamHo> getQuanHeVoiHocSinh() {
         return Collections.unmodifiableList(quanHeVoiHocSinh);
-    }
-
-    public String getHoTenDayDu() {
-        return ho + " " + (tenLot != null && !tenLot.isBlank() ? tenLot + " " : "") + ten;
     }
 
     public void guiThongBao(String noiDung) {

@@ -2,19 +2,38 @@ package com.famta.service;
 
 import com.famta.database.DatabaseManager;
 import com.famta.model.HocSinh;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * JDBC-backed implementation that reads students from the SQL Server database.
  */
 public class JdbcHocVienService implements HocVienService {
 
+    private static final boolean HAS_GENDER_COLUMN = detectGenderColumn();
+
     private static final String BASE_SELECT =
-        "SELECT MaHocSinh, Ho, TenLot, Ten, NgaySinh, NgayNhapHoc FROM HOCSINH";
+        "SELECT MaHocSinh, Ho, TenLot, Ten, NgaySinh, NgayNhapHoc" +
+            (HAS_GENDER_COLUMN ? ", GioiTinh" : "") +
+            " FROM HOCSINH";
+
+    private static final String INSERT_WITH_GENDER =
+        "INSERT INTO HOCSINH (MaHocSinh, Ho, TenLot, Ten, NgaySinh, NgayNhapHoc, GioiTinh) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+    private static final String INSERT_WITHOUT_GENDER =
+        "INSERT INTO HOCSINH (MaHocSinh, Ho, TenLot, Ten, NgaySinh, NgayNhapHoc) " +
+            "VALUES (?, ?, ?, ?, ?, ?)";
 
     @Override
     public List<HocSinh> getAllHocVien() {
@@ -53,7 +72,30 @@ public class JdbcHocVienService implements HocVienService {
 
     @Override
     public boolean addHocVien(HocSinh hocVien) {
-        throw new UnsupportedOperationException("Chức năng thêm học viên chưa được triển khai cho JDBC service");
+        Objects.requireNonNull(hocVien, "hocVien");
+        if (hocVien.getMaHocSinh() == null || hocVien.getMaHocSinh().isBlank()) {
+            throw new IllegalArgumentException("Mã học viên không được để trống");
+        }
+        if (getHocVienById(hocVien.getMaHocSinh()) != null) {
+            return false;
+        }
+
+        Connection connection = DatabaseManager.getInstance().getConnection();
+        String sql = HAS_GENDER_COLUMN ? INSERT_WITH_GENDER : INSERT_WITHOUT_GENDER;
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, hocVien.getMaHocSinh().trim());
+            statement.setString(2, trimToNull(hocVien.getHo()));
+            statement.setString(3, trimToNull(hocVien.getTenLot()));
+            statement.setString(4, trimToNull(hocVien.getTen()));
+            setDate(statement, 5, hocVien.getNgaySinh());
+            setDate(statement, 6, hocVien.getNgayNhapHoc());
+            if (HAS_GENDER_COLUMN) {
+                statement.setString(7, trimToNull(hocVien.getGioiTinh()));
+            }
+            return statement.executeUpdate() == 1;
+        } catch (SQLException ex) {
+            throw new IllegalStateException("Không thể thêm học viên mới", ex);
+        }
     }
 
     @Override
@@ -89,7 +131,7 @@ public class JdbcHocVienService implements HocVienService {
         String ten = safeTrim(resultSet.getString("Ten"));
         LocalDate ngaySinh = toLocalDate(resultSet, "NgaySinh");
         LocalDate ngayNhapHoc = toLocalDate(resultSet, "NgayNhapHoc");
-        String gioiTinh = readOptionalString(resultSet, "GioiTinh");
+        String gioiTinh = HAS_GENDER_COLUMN ? readOptionalString(resultSet, "GioiTinh") : null;
 
         HocSinh hocSinh = new HocSinh(
             maHocSinh,
@@ -113,11 +155,6 @@ public class JdbcHocVienService implements HocVienService {
     }
 
     private static String readOptionalString(ResultSet resultSet, String column) throws SQLException {
-        try {
-            resultSet.findColumn(column);
-        } catch (SQLException missingColumn) {
-            return null;
-        }
         String value = resultSet.getString(column);
         return value == null ? null : value.trim();
     }
@@ -134,5 +171,33 @@ public class JdbcHocVienService implements HocVienService {
             return "Nữ";
         }
         return value.trim();
+    }
+
+    private static String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private static void setDate(PreparedStatement statement, int index, LocalDate date) throws SQLException {
+        if (date == null) {
+            statement.setNull(index, Types.DATE);
+        } else {
+            statement.setDate(index, Date.valueOf(date));
+        }
+    }
+
+    private static boolean detectGenderColumn() {
+        Connection connection = DatabaseManager.getInstance().getConnection();
+        try {
+            DatabaseMetaData metaData = connection.getMetaData();
+            try (ResultSet rs = metaData.getColumns(connection.getCatalog(), null, "HOCSINH", "GioiTinh")) {
+                return rs.next();
+            }
+        } catch (SQLException ex) {
+            return false;
+        }
     }
 }
