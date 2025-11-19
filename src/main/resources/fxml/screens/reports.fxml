@@ -5,6 +5,8 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
@@ -14,14 +16,15 @@
       <Label text="Báo cáo &amp; Thống kê" styleClass="view-title" />
       <HBox alignment="CENTER_LEFT" spacing="10.0">
          <children>
-            <ComboBox fx:id="reportCombo" prefWidth="180.0" promptText="Chọn báo cáo" />
+            <ComboBox fx:id="reportCombo" prefWidth="220.0" promptText="Chọn báo cáo" />
+            <ComboBox fx:id="classCombo" prefWidth="200.0" promptText="Chọn lớp" />
+            <TextField fx:id="thresholdField" promptText="Điểm chuẩn" prefWidth="120.0" />
             <DatePicker fx:id="fromDatePicker" promptText="Từ ngày" />
             <DatePicker fx:id="toDatePicker" promptText="Đến ngày" />
-            <ComboBox fx:id="unitCombo" prefWidth="160.0" promptText="Đơn vị" />
             <Pane HBox.hgrow="ALWAYS" />
-            <Button fx:id="filterButton" mnemonicParsing="false" text="Lọc dữ liệu" onAction="#handleRefresh" />
-            <Button fx:id="exportButton" mnemonicParsing="false" text="Xuất PDF" disable="true" />
-            <Button fx:id="scheduleButton" mnemonicParsing="false" text="Lên lịch email" disable="true" />
+            <Button fx:id="filterButton" mnemonicParsing="false" text="Cập nhật chỉ số" onAction="#handleRefresh" />
+            <Button fx:id="generateButton" mnemonicParsing="false" text="Tạo báo cáo" onAction="#handleGenerate" />
+            <Button fx:id="copyButton" mnemonicParsing="false" text="Sao chép" onAction="#handleCopy" disable="true" />
          </children>
       </HBox>
       <VBox spacing="12.0" VBox.vgrow="ALWAYS">
@@ -49,10 +52,17 @@
                   </VBox>
                </children>
             </HBox>
-            <VBox spacing="10.0" styleClass="chart-placeholder" VBox.vgrow="ALWAYS">
+            <VBox spacing="10.0" styleClass="chart-placeholder">
                <children>
                   <Label text="Biểu đồ" styleClass="section-title" />
                   <Label fx:id="chartDescription" wrapText="true" text="Khu vực hiển thị biểu đồ đường/cột cho báo cáo được chọn." />
+               </children>
+            </VBox>
+            <VBox spacing="8.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <Label text="Nội dung báo cáo" styleClass="section-title" />
+                  <Label fx:id="reportStatusLabel" text="Chưa tạo báo cáo" styleClass="info-text" />
+                  <TextArea fx:id="reportPreview" promptText="Kết quả báo cáo sẽ hiển thị tại đây" wrapText="true" VBox.vgrow="ALWAYS" styleClass="report-output" />
                </children>
             </VBox>
          </children>
