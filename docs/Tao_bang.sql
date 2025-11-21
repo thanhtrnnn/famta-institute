@@ -1,3 +1,8 @@
+CREATE DATABASE FAMTAInstitute;
+GO
+USE FAMTAInstitute;
+GO
+
 -- Tạo bảng HOCSINH
 CREATE TABLE HOCSINH(
     MaHocSinh VARCHAR(10) PRIMARY KEY,
@@ -133,6 +138,20 @@ CREATE TABLE LOPHOC (
     FOREIGN KEY (MaHocKy)        REFERENCES HOCKY(MaHocKy),
     FOREIGN KEY (TietHocBatDau)  REFERENCES TIETHOC(MaTietHoc),
     FOREIGN KEY (TietHocKetThuc) REFERENCES TIETHOC(MaTietHoc),
+    FOREIGN KEY (MaPhongHoc)     REFERENCES PHONGHOC(MaPhongHoc)
+);
+
+-- Tạo bảng LICH_HOC
+CREATE TABLE LICH_HOC (
+    MaLichHoc      VARCHAR(10) PRIMARY KEY,
+    MaLopHoc       VARCHAR(10) NOT NULL,
+    Thu            INT NOT NULL,
+    TietBatDau     VARCHAR(10) NOT NULL,
+    TietKetThuc    VARCHAR(10) NOT NULL,
+    MaPhongHoc     VARCHAR(10),
+    FOREIGN KEY (MaLopHoc)       REFERENCES LOPHOC(MaLopHoc),
+    FOREIGN KEY (TietBatDau)     REFERENCES TIETHOC(MaTietHoc),
+    FOREIGN KEY (TietKetThuc)    REFERENCES TIETHOC(MaTietHoc),
     FOREIGN KEY (MaPhongHoc)     REFERENCES PHONGHOC(MaPhongHoc)
 );
 

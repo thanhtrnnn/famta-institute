@@ -1,5 +1,5 @@
 SET NOCOUNT ON;
-
+-- Mac dinh mat khau (loai tai khoan) + "123"
 DECLARE @AdminPasswordHash NVARCHAR(64) = 'JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=';
 DECLARE @TeacherPasswordHash NVARCHAR(64) = 'zeOD7ujuekQArfehX3FvF5ouuXZGs34InrjW0E5mNBY=';
 DECLARE @GuardianPasswordHash NVARCHAR(64) = 'NdQ0j3NBEJow80GZ6H/fG6ynqDFI9vpEjtcfc3UztHU=';
@@ -158,16 +158,16 @@ WHERE NOT EXISTS (
 );
 
 -- Nguoi giam ho
-INSERT INTO NGUOIGIAMHO (MaNguoiGiamHo, Ho, TenLot, Ten, DiaChiEmail)
-SELECT src.MaNguoiGiamHo, src.Ho, src.TenLot, src.Ten, src.DiaChiEmail
+INSERT INTO NGUOIGIAMHO (MaNguoiGiamHo, Ho, TenLot, Ten, DiaChiEmail, SDT)
+SELECT src.MaNguoiGiamHo, src.Ho, src.TenLot, src.Ten, src.DiaChiEmail, src.SDT
 FROM (VALUES
-	('GH00000001', N'Trần', N'Xuân', N'Thành', 'thanhchan@gmail.com'),
-	('GH00000002', N'Lê', N'Thị', N'Mai', 'le.mai@gmail.com'),
-	('GH00000003', N'Nguyễn', N'Đức', N'Phúc', 'phuc.nguyen@gmail.com'),
-	('GH00000004', N'Phạm', N'Thị', N'Hương', 'huong.pham@gmail.com'),
-	('GH00000005', N'Đỗ', N'Minh', N'Đức', 'duc.do@gmail.com'),
-	('GH00000006', N'Võ', N'Thị', N'Thanh', 'thanh.vo@gmail.com')
-) AS src (MaNguoiGiamHo, Ho, TenLot, Ten, DiaChiEmail)
+	('GH00000001', N'Trần', N'Xuân', N'Thành', 'thanhchan@gmail.com', '0123456789'),
+	('GH00000002', N'Lê', N'Thị', N'Mai', 'le.mai@gmail.com', '0936363636'),
+	('GH00000003', N'Nguyễn', N'Đức', N'Phúc', 'phuc.nguyen@gmail.com', '0987654321'),
+	('GH00000004', N'Phạm', N'Thị', N'Hương', 'huong.pham@gmail.com', '0912345678'),
+	('GH00000005', N'Đỗ', N'Minh', N'Đức', 'duc.do@gmail.com', '0976543210'),
+	('GH00000006', N'Võ', N'Thị', N'Thanh', 'thanh.vo@gmail.com', '0965432109')
+) AS src (MaNguoiGiamHo, Ho, TenLot, Ten, DiaChiEmail, SDT)
 WHERE NOT EXISTS (
 	SELECT 1 FROM NGUOIGIAMHO target WHERE target.MaNguoiGiamHo = src.MaNguoiGiamHo
 );
@@ -201,39 +201,40 @@ FROM (VALUES
 	('teacher', @TeacherPasswordHash, 'GIAO_VIEN'),
 	('guardian', @GuardianPasswordHash, 'PHU_HUYNH'),
 	('student', @StudentPasswordHash, 'HOC_VIEN'),
-	('teacher.hoang', @TeacherPasswordHash, 'GIAO_VIEN'),
-	('teacher.lan', @TeacherPasswordHash, 'GIAO_VIEN'),
-	('teacher.minh', @TeacherPasswordHash, 'GIAO_VIEN'),
-	('guardian.thanh', @GuardianPasswordHash, 'PHU_HUYNH'),
-	('guardian.mai', @GuardianPasswordHash, 'PHU_HUYNH'),
-	('guardian.phuc', @GuardianPasswordHash, 'PHU_HUYNH'),
-	('guardian.huong', @GuardianPasswordHash, 'PHU_HUYNH'),
-	('guardian.duc', @GuardianPasswordHash, 'PHU_HUYNH'),
-	('guardian.thanhvo', @GuardianPasswordHash, 'PHU_HUYNH'),
-	('student.anh', @StudentPasswordHash, 'HOC_VIEN'),
-	('student.chau', @StudentPasswordHash, 'HOC_VIEN'),
-	('student.khoi', @StudentPasswordHash, 'HOC_VIEN'),
-	('student.hong', @StudentPasswordHash, 'HOC_VIEN'),
-	('student.phuc', @StudentPasswordHash, 'HOC_VIEN'),
-	('student.linh', @StudentPasswordHash, 'HOC_VIEN')
+	('gv.thipd', @TeacherPasswordHash, 'GIAO_VIEN'),
+	('gv.hoangnv', @TeacherPasswordHash, 'GIAO_VIEN'),
+	('gv.lantt', @TeacherPasswordHash, 'GIAO_VIEN'),
+	('gv.minhlq', @TeacherPasswordHash, 'GIAO_VIEN'),
+	('ngh.thanhtx', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('ngh.mailt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('ngh.phucnd', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('ngh.huongpt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('ngh.ducdm', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('ngh.thanhvt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('hs.anhpt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.chaunb', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.khoilm', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.hongdt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.phuctg', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.linhvk', @StudentPasswordHash, 'HOC_VIEN')
 ) AS src (TenDangNhap, MatKhauHash, Quyen)
 WHERE NOT EXISTS (
 	SELECT 1 FROM TAIKHOAN target WHERE target.TenDangNhap = src.TenDangNhap
 );
 
 -- Bang diem theo lop
-INSERT INTO HOCSINH_LOPHOC (MaHocSinh, MaLopHoc, DiemSo)
-SELECT src.MaHocSinh, src.MaLopHoc, src.DiemSo
+INSERT INTO HOCSINH_LOPHOC (MaHocSinh, MaLopHoc, DiemThuongXuyen, DiemGiuaKy, DiemCuoiKy)
+SELECT src.MaHocSinh, src.MaLopHoc, src.DiemThuongXuyen, src.DiemGiuaKy, src.DiemCuoiKy
 FROM (VALUES
-	('HS00000001', 'LH00000001', 8.5),
-	('HS00000001', 'LH00000002', 8.8),
-	('HS00000002', 'LH00000001', 9.1),
-	('HS00000002', 'LH00000002', 8.4),
-	('HS00000003', 'LH00000003', 7.9),
-	('HS00000004', 'LH00000003', 8.7),
-	('HS00000005', 'LH00000004', 8.2),
-	('HS00000006', 'LH00000004', 9.0)
-) AS src (MaHocSinh, MaLopHoc, DiemSo)
+	('HS00000001', 'LH00000001', 8.5, 6.5, 9.0),
+	('HS00000001', 'LH00000002', 8.8, 7.0, 8.5),
+	('HS00000002', 'LH00000001', 9.1, 8.0, 9.5),
+	('HS00000002', 'LH00000002', 8.4, 9.5, 8.0),
+	('HS00000003', 'LH00000003', 7.9, 8.0, 7.5),
+	('HS00000004', 'LH00000003', 8.7, 9.0, 10),
+	('HS00000005', 'LH00000004', 8.2, 9.5, 9.5),
+	('HS00000006', 'LH00000004', 9.0, 9.0, 8.5)
+) AS src (MaHocSinh, MaLopHoc, DiemThuongXuyen, DiemGiuaKy, DiemCuoiKy)
 WHERE NOT EXISTS (
 	SELECT 1
 	FROM HOCSINH_LOPHOC target
@@ -242,18 +243,18 @@ WHERE NOT EXISTS (
 );
 
 -- Tong hop hoc sinh theo nam hoc/khoi/lop
-INSERT INTO HOCSINH_NAMHOC_KHOI_LOPHOC (MaHocSinh, MaNamHoc, MaKhoi, MaLopHoc, DiemSo)
-SELECT src.MaHocSinh, src.MaNamHoc, src.MaKhoi, src.MaLopHoc, src.DiemSo
+INSERT INTO HOCSINH_NAMHOC_KHOI_LOPHOC (MaHocSinh, MaNamHoc, MaKhoi, MaLopHoc, DiemThuongXuyen, DiemGiuaKy, DiemCuoiKy)
+SELECT src.MaHocSinh, src.MaNamHoc, src.MaKhoi, src.MaLopHoc, src.DiemThuongXuyen, src.DiemGiuaKy, src.DiemCuoiKy
 FROM (VALUES
-	('HS00000001', 'NH00000001', 'KH00000001', 'LH00000001', 8.5),
-	('HS00000001', 'NH00000001', 'KH00000001', 'LH00000002', 8.8),
-	('HS00000002', 'NH00000001', 'KH00000001', 'LH00000001', 9.1),
-	('HS00000002', 'NH00000001', 'KH00000001', 'LH00000002', 8.4),
-	('HS00000003', 'NH00000001', 'KH00000002', 'LH00000003', 7.9),
-	('HS00000004', 'NH00000001', 'KH00000002', 'LH00000003', 8.7),
-	('HS00000005', 'NH00000001', 'KH00000003', 'LH00000004', 8.2),
-	('HS00000006', 'NH00000001', 'KH00000003', 'LH00000004', 9.0)
-) AS src (MaHocSinh, MaNamHoc, MaKhoi, MaLopHoc, DiemSo)
+	('HS00000001', 'NH00000001', 'KH00000001', 'LH00000001', 8.5, 6.5, 9.0),
+	('HS00000001', 'NH00000001', 'KH00000001', 'LH00000002', 8.8, 7.0, 8.5),
+	('HS00000002', 'NH00000001', 'KH00000001', 'LH00000001', 9.1, 8.0, 9.5),
+	('HS00000002', 'NH00000001', 'KH00000001', 'LH00000002', 8.4, 9.5, 8.0),
+	('HS00000003', 'NH00000001', 'KH00000002', 'LH00000003', 7.9, 8.0, 7.5),
+	('HS00000004', 'NH00000001', 'KH00000002', 'LH00000003', 8.7, 9.0, 10),
+	('HS00000005', 'NH00000001', 'KH00000003', 'LH00000004', 8.2, 9.5, 9.5),
+	('HS00000006', 'NH00000001', 'KH00000003', 'LH00000004', 9.0, 9.0, 8.5)
+) AS src (MaHocSinh, MaNamHoc, MaKhoi, MaLopHoc, DiemThuongXuyen, DiemGiuaKy, DiemCuoiKy)
 WHERE NOT EXISTS (
 	SELECT 1
 	FROM HOCSINH_NAMHOC_KHOI_LOPHOC target
