@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.famta.controller.GuardianManagementController"
+      spacing="10" style="-fx-padding: 20;">
+
+    <Label text="Quản lý người giám hộ" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="Tìm kiếm..." prefWidth="300"/>
+        <Button text="Tìm kiếm" onAction="#handleSearch"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Thêm Mới" onAction="#handleAdd"/>
+        <Button text="Sửa" onAction="#handleEdit"/>
+        <Button text="Xóa" onAction="#handleDelete"/>
+        <Button text="Làm mới" onAction="#loadData"/>
+    </HBox>
+
+    <TableView fx:id="table" VBox.vgrow="ALWAYS">
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+        <columns>
+            <TableColumn fx:id="colMa" text="Mã NGH" prefWidth="100"/>
+            <TableColumn fx:id="colHo" text="Họ" prefWidth="150"/>
+            <TableColumn fx:id="colTenLot" text="Tên Lót" prefWidth="150"/>
+            <TableColumn fx:id="colTen" text="Tên" prefWidth="150"/>
+            <TableColumn fx:id="colEmail" text="Email" prefWidth="200"/>
+            <TableColumn fx:id="colSdt" text="SĐT" prefWidth="150"/>
+        </columns>
+    </TableView>
+</VBox>

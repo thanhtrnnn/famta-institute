@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.famta.controller.LoginController" styleClass="login-root">
+  <children>
+    <VBox alignment="CENTER" spacing="20.0">
+      <children>
+        <VBox alignment="CENTER" spacing="10.0">
+          <children>
+            <Label text="FAMTA Institute" styleClass="login-brand" />
+            <Label text="Hệ thống quản lý đào tạo" styleClass="login-caption" />
+          </children>
+        </VBox>
+        <VBox spacing="14.0" styleClass="login-card">
+          <children>
+            <Label text="Đăng nhập" styleClass="login-title" />
+            <Label text="Sử dụng thông tin do quản trị cấp" styleClass="login-subtitle" />
+            <TextField fx:id="usernameField" promptText="Tên đăng nhập" onAction="#handleLogin" />
+            <PasswordField fx:id="passwordField" promptText="Mật khẩu" onAction="#handleLogin" />
+            <Label fx:id="messageLabel" text="" styleClass="error-message" />
+            <HBox alignment="CENTER_RIGHT" spacing="10.0">
+              <children>
+                <ProgressIndicator fx:id="progressIndicator" prefHeight="24.0" prefWidth="24.0" visible="false" />
+                <Button mnemonicParsing="false" text="Thoát" onAction="#handleExit" styleClass="secondary" />
+                <Button fx:id="loginButton" mnemonicParsing="false" text="Đăng nhập" defaultButton="true" onAction="#handleLogin" />
+              </children>
+            </HBox>
+          </children>
+          <padding>
+            <Insets top="28.0" right="28.0" bottom="28.0" left="28.0" />
+          </padding>
+        </VBox>
+      </children>
+    </VBox>
+  </children>
+</StackPane>

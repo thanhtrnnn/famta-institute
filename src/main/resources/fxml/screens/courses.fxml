@@ -10,42 +10,22 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" alignment="TOP_LEFT" spacing="18.0" styleClass="view-container">
+<VBox xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" alignment="TOP_LEFT" spacing="18.0" styleClass="view-container" fx:controller="com.famta.controller.CourseManagementController">
    <children>
       <Label text="Quản lý khóa học" styleClass="view-title" />
       <HBox alignment="CENTER_LEFT" spacing="10.0">
          <children>
-            <TextField promptText="Tìm khóa học" />
-            <ComboBox prefWidth="160.0" promptText="Bộ môn" />
-            <ComboBox prefWidth="140.0" promptText="Cấp độ" />
-            <ComboBox prefWidth="140.0" promptText="Trạng thái" />
+            <TextField fx:id="searchField" promptText="Tìm khóa học" />
+            <ComboBox fx:id="departmentFilter" prefWidth="160.0" promptText="Bộ môn" />
+            <ComboBox fx:id="levelFilter" prefWidth="140.0" promptText="Cấp độ" />
+            <ComboBox fx:id="statusFilter" prefWidth="140.0" promptText="Trạng thái" />
             <Pane HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" text="Tạo khóa học" />
-            <Button mnemonicParsing="false" text="Nhập danh mục" />
+            <Button mnemonicParsing="false" text="Tạo khóa học" onAction="#handleCreateCourse" />
+            <Button mnemonicParsing="false" text="Nhập danh mục" onAction="#handleImportCatalog" />
          </children>
       </HBox>
-      <FlowPane hgap="14.0" vgap="14.0">
-         <children>
-            <VBox spacing="6.0" styleClass="course-card">
-               <Label text="Toán nâng cao 6" styleClass="card-title" />
-               <Label text="Thời lượng: 36 tiết" styleClass="card-meta" />
-               <Label wrapText="true" text="Ôn luyện kiến thức nền tảng và nâng cao tư duy logic cho học sinh lớp 6." />
-               <Button mnemonicParsing="false" text="Xem chi tiết" />
-            </VBox>
-            <VBox spacing="6.0" styleClass="course-card">
-               <Label text="Tiếng Anh giao tiếp" styleClass="card-title" />
-               <Label text="Thời lượng: 24 tiết" styleClass="card-meta" />
-               <Label wrapText="true" text="Tăng cường phản xạ nghe nói thông qua hoạt động theo nhóm nhỏ." />
-               <Button mnemonicParsing="false" text="Xem chi tiết" />
-            </VBox>
-            <VBox spacing="6.0" styleClass="course-card">
-               <Label text="STEM Robotics" styleClass="card-title" />
-               <Label text="Thời lượng: 30 tiết" styleClass="card-meta" />
-               <Label wrapText="true" text="Lập trình và lắp ráp robot cơ bản dành cho học sinh khối 7-8." />
-               <Button mnemonicParsing="false" text="Xem chi tiết" />
-            </VBox>
-         </children>
-      </FlowPane>
+      <Label fx:id="summaryLabel" styleClass="info-text" text="Đang tải danh sách khóa học..." />
+      <FlowPane fx:id="courseContainer" hgap="14.0" vgap="14.0" VBox.vgrow="ALWAYS" />
    </children>
    <padding>
       <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
