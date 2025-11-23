@@ -1,6 +1,5 @@
 package com.famta.model;
 
-import java.util.Locale;
 import java.util.Objects;
 
 public class PhongHoc {

@@ -63,7 +63,7 @@ public class HocSinh extends NguoiDung {
         MoiQuanHeGiamHo quanHe = new MoiQuanHeGiamHo(this, nguoiGiamHo, loaiNguoiGiamHo);
         danhSachGiamHo.add(quanHe);
         if (nguoiGiamHo != null) {
-            nguoiGiamHo.addMoiQuanHeInternal(quanHe);
+            nguoiGiamHo.addMoiQuanHe(quanHe);
         }
     }
 
