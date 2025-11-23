@@ -47,11 +47,7 @@ public class NguoiGiamHo extends NguoiDung {
         System.out.printf("Gui thong bao toi %s: %s%n", getHoTenDayDu(), noiDung);
     }
 
-    public void guiNhacNhoHocPhi() {
-        guiThongBao("Vui long hoan tat hoc phi cho hoc vien dang duoc ban giam ho.");
-    }
-
-    void addMoiQuanHeInternal(MoiQuanHeGiamHo quanHe) {
+    public void addMoiQuanHe(MoiQuanHeGiamHo quanHe) {
         if (!quanHeVoiHocSinh.contains(quanHe)) {
             quanHeVoiHocSinh.add(quanHe);
         }

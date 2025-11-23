@@ -59,6 +59,7 @@ public class DatabaseManager {
         connect();
         initializeSchemaIfNeeded();
         ensureAccountTable();
+        ensureSchemaUpdates();
     }
 
     public static synchronized DatabaseManager getInstance() {
@@ -142,6 +143,63 @@ public class DatabaseManager {
             System.out.println("Created TAIKHOAN table for authentication module.");
         } catch (SQLException ex) {
             throw new IllegalStateException("Unable to create TAIKHOAN table", ex);
+        }
+    }
+
+    private void ensureSchemaUpdates() {
+        try (Statement stmt = getConnection().createStatement()) {
+            // Check and add TenDangNhap to HOCSINH
+            if (!columnExists("HOCSINH", "TenDangNhap")) {
+                stmt.execute("ALTER TABLE HOCSINH ADD TenDangNhap NVARCHAR(50)");
+                System.out.println("Added TenDangNhap column to HOCSINH table.");
+            }
+            // Check and add TenDangNhap to GIAOVIEN
+            if (!columnExists("GIAOVIEN", "TenDangNhap")) {
+                stmt.execute("ALTER TABLE GIAOVIEN ADD TenDangNhap NVARCHAR(50)");
+                System.out.println("Added TenDangNhap column to GIAOVIEN table.");
+            }
+            // Check and add TenDangNhap to NGUOIGIAMHO
+            if (!columnExists("NGUOIGIAMHO", "TenDangNhap")) {
+                stmt.execute("ALTER TABLE NGUOIGIAMHO ADD TenDangNhap NVARCHAR(50)");
+                System.out.println("Added TenDangNhap column to NGUOIGIAMHO table.");
+            }
+            
+            // Populate TenDangNhap if null (Simple mapping for demo data)
+            populateTenDangNhap(stmt);
+            
+        } catch (SQLException ex) {
+            System.err.println("Failed to apply schema updates: " + ex.getMessage());
+        }
+    }
+
+    private void populateTenDangNhap(Statement stmt) throws SQLException {
+        // Students
+        stmt.executeUpdate("UPDATE HOCSINH SET TenDangNhap = 'hs.anhpt' WHERE MaHocSinh = 'HS00000001' AND TenDangNhap IS NULL");
+        stmt.executeUpdate("UPDATE HOCSINH SET TenDangNhap = 'hs.chaunb' WHERE MaHocSinh = 'HS00000002' AND TenDangNhap IS NULL");
+        stmt.executeUpdate("UPDATE HOCSINH SET TenDangNhap = 'hs.khoilm' WHERE MaHocSinh = 'HS00000003' AND TenDangNhap IS NULL");
+        stmt.executeUpdate("UPDATE HOCSINH SET TenDangNhap = 'hs.hongdt' WHERE MaHocSinh = 'HS00000004' AND TenDangNhap IS NULL");
+        stmt.executeUpdate("UPDATE HOCSINH SET TenDangNhap = 'hs.phuctg' WHERE MaHocSinh = 'HS00000005' AND TenDangNhap IS NULL");
+        stmt.executeUpdate("UPDATE HOCSINH SET TenDangNhap = 'hs.linhvk' WHERE MaHocSinh = 'HS00000006' AND TenDangNhap IS NULL");
+
+        // Teachers
+        stmt.executeUpdate("UPDATE GIAOVIEN SET TenDangNhap = 'gv.thipd' WHERE MaGiaoVien = 'GV00000001' AND TenDangNhap IS NULL");
+        stmt.executeUpdate("UPDATE GIAOVIEN SET TenDangNhap = 'gv.hoangnv' WHERE MaGiaoVien = 'GV00000002' AND TenDangNhap IS NULL");
+        stmt.executeUpdate("UPDATE GIAOVIEN SET TenDangNhap = 'gv.lantt' WHERE MaGiaoVien = 'GV00000003' AND TenDangNhap IS NULL");
+        stmt.executeUpdate("UPDATE GIAOVIEN SET TenDangNhap = 'gv.minhlq' WHERE MaGiaoVien = 'GV00000004' AND TenDangNhap IS NULL");
+
+        // Guardians
+        stmt.executeUpdate("UPDATE NGUOIGIAMHO SET TenDangNhap = 'ngh.thanhtx' WHERE MaNguoiGiamHo = 'GH00000001' AND TenDangNhap IS NULL");
+        stmt.executeUpdate("UPDATE NGUOIGIAMHO SET TenDangNhap = 'ngh.mailt' WHERE MaNguoiGiamHo = 'GH00000002' AND TenDangNhap IS NULL");
+        stmt.executeUpdate("UPDATE NGUOIGIAMHO SET TenDangNhap = 'ngh.phucnd' WHERE MaNguoiGiamHo = 'GH00000003' AND TenDangNhap IS NULL");
+        stmt.executeUpdate("UPDATE NGUOIGIAMHO SET TenDangNhap = 'ngh.huongpt' WHERE MaNguoiGiamHo = 'GH00000004' AND TenDangNhap IS NULL");
+        stmt.executeUpdate("UPDATE NGUOIGIAMHO SET TenDangNhap = 'ngh.ducdm' WHERE MaNguoiGiamHo = 'GH00000005' AND TenDangNhap IS NULL");
+        stmt.executeUpdate("UPDATE NGUOIGIAMHO SET TenDangNhap = 'ngh.thanhvt' WHERE MaNguoiGiamHo = 'GH00000006' AND TenDangNhap IS NULL");
+    }
+
+    private boolean columnExists(String tableName, String columnName) throws SQLException {
+        DatabaseMetaData meta = getConnection().getMetaData();
+        try (ResultSet rs = meta.getColumns(null, null, tableName, columnName)) {
+            return rs.next();
         }
     }
 
