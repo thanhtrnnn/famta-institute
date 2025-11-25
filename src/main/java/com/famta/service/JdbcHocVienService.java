@@ -46,7 +46,7 @@ public class JdbcHocVienService implements HocVienService {
                 }
             }
         } catch (SQLException ex) {
-            throw new IllegalStateException("Không thể tải danh sách học viên từ cơ sở dữ liệu", ex);
+            throw new IllegalStateException("Không thể tải danh sách học sinh từ cơ sở dữ liệu", ex);
         }
         return students;
     }
@@ -65,16 +65,38 @@ public class JdbcHocVienService implements HocVienService {
                 }
             }
         } catch (SQLException ex) {
-            throw new IllegalStateException("Không thể truy vấn học viên: " + maHocVien, ex);
+            throw new IllegalStateException("Không thể truy vấn học sinh: " + maHocVien, ex);
         }
         return null;
+    }
+
+    public List<HocSinh> getHocVienByClass(String maLopHoc) {
+        List<HocSinh> students = new ArrayList<>();
+        String sql = "SELECT HOCSINH.MaHocSinh, HOCSINH.Ho, HOCSINH.TenLot, HOCSINH.Ten, HOCSINH.NgaySinh, HOCSINH.NgayNhapHoc" +
+            (HAS_GENDER_COLUMN ? ", HOCSINH.GioiTinh" : "") +
+            " FROM HOCSINH" +
+            " JOIN HOCSINH_LOPHOC hsl ON HOCSINH.MaHocSinh = hsl.MaHocSinh" +
+            " WHERE hsl.MaLopHoc = ?" +
+            " ORDER BY HOCSINH.MaHocSinh";
+        Connection connection = DatabaseManager.getInstance().getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, maLopHoc);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    students.add(mapHocSinh(resultSet));
+                }
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException("Không thể tải danh sách học sinh theo lớp", ex);
+        }
+        return students;
     }
 
     @Override
     public boolean addHocVien(HocSinh hocVien) {
         Objects.requireNonNull(hocVien, "hocVien");
         if (hocVien.getMaHocSinh() == null || hocVien.getMaHocSinh().isBlank()) {
-            throw new IllegalArgumentException("Mã học viên không được để trống");
+            throw new IllegalArgumentException("Mã học sinh không được để trống");
         }
         if (getHocVienById(hocVien.getMaHocSinh()) != null) {
             return false;
@@ -94,18 +116,58 @@ public class JdbcHocVienService implements HocVienService {
             }
             return statement.executeUpdate() == 1;
         } catch (SQLException ex) {
-            throw new IllegalStateException("Không thể thêm học viên mới", ex);
+            throw new IllegalStateException("Không thể thêm học sinh mới", ex);
         }
     }
 
     @Override
     public boolean updateHocVien(HocSinh hocVien) {
-        throw new UnsupportedOperationException("Chức năng cập nhật học viên chưa được triển khai cho JDBC service");
+        Objects.requireNonNull(hocVien, "hocVien");
+        if (hocVien.getMaHocSinh() == null || hocVien.getMaHocSinh().isBlank()) {
+            throw new IllegalArgumentException("Mã học sinh không được để trống");
+        }
+
+        Connection connection = DatabaseManager.getInstance().getConnection();
+        String sql;
+        if (HAS_GENDER_COLUMN) {
+            sql = "UPDATE HOCSINH SET Ho = ?, TenLot = ?, Ten = ?, NgaySinh = ?, NgayNhapHoc = ?, GioiTinh = ? WHERE MaHocSinh = ?";
+        } else {
+            sql = "UPDATE HOCSINH SET Ho = ?, TenLot = ?, Ten = ?, NgaySinh = ?, NgayNhapHoc = ? WHERE MaHocSinh = ?";
+        }
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, trimToNull(hocVien.getHo()));
+            statement.setString(2, trimToNull(hocVien.getTenLot()));
+            statement.setString(3, trimToNull(hocVien.getTen()));
+            setDate(statement, 4, hocVien.getNgaySinh());
+            setDate(statement, 5, hocVien.getNgayNhapHoc());
+            
+            if (HAS_GENDER_COLUMN) {
+                statement.setString(6, trimToNull(hocVien.getGioiTinh()));
+                statement.setString(7, hocVien.getMaHocSinh().trim());
+            } else {
+                statement.setString(6, hocVien.getMaHocSinh().trim());
+            }
+            
+            return statement.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            throw new IllegalStateException("Không thể cập nhật học sinh: " + hocVien.getMaHocSinh(), ex);
+        }
     }
 
     @Override
     public boolean deleteHocVien(String maHocVien) {
-        throw new UnsupportedOperationException("Chức năng xóa học viên chưa được triển khai cho JDBC service");
+        if (maHocVien == null || maHocVien.isBlank()) {
+            return false;
+        }
+        Connection connection = DatabaseManager.getInstance().getConnection();
+        String sql = "DELETE FROM HOCSINH WHERE MaHocSinh = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, maHocVien.trim());
+            return statement.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            throw new IllegalStateException("Không thể xóa học sinh: " + maHocVien, ex);
+        }
     }
 
     @Override
