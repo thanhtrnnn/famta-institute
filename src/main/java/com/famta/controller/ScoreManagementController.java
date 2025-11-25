@@ -1,5 +1,8 @@
 package com.famta.controller;
 
+import com.famta.model.HocKy;
+import com.famta.model.NamHoc;
+import com.famta.service.JdbcCatalogService;
 import com.famta.service.JdbcScoreService;
 import com.famta.service.ScoreService;
 import com.famta.service.dto.ScoreClassOption;
@@ -46,6 +49,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import javafx.util.StringConverter;
 
+import com.famta.model.QuyenTruyCap;
+import com.famta.model.TaiKhoan;
+import com.famta.session.UserSession;
+import com.famta.util.SecurityContext;
+
 /**
  * Controller responsible for managing the score entry screen.
  */
@@ -61,6 +69,12 @@ public class ScoreManagementController {
         symbols.setDecimalSeparator('.');
         DECIMAL_FORMAT = new DecimalFormat("0.##", symbols);
     }
+
+    @FXML
+    private ComboBox<NamHoc> yearFilter;
+
+    @FXML
+    private ComboBox<HocKy> semesterFilter;
 
     @FXML
     private ComboBox<ScoreClassOption> classFilter;
@@ -93,6 +107,9 @@ public class ScoreManagementController {
     private TableColumn<ScoreRow, Double> finalScoreColumn;
 
     @FXML
+    private TableColumn<ScoreRow, Double> averageScoreColumn;
+
+    @FXML
     private Button downloadTemplateButton;
 
     @FXML
@@ -107,6 +124,7 @@ public class ScoreManagementController {
     @FXML
     private Label statusLabel;
 
+    private final JdbcCatalogService catalogService = new JdbcCatalogService();
     private final ScoreService scoreService = new JdbcScoreService();
     private final ObservableList<ScoreRow> masterData = FXCollections.observableArrayList();
     private final ObservableList<ScoreClassOption> allClassOptions = FXCollections.observableArrayList();
@@ -119,12 +137,30 @@ public class ScoreManagementController {
         configureTable();
         configureFilters();
         configureButtons();
-        loadClassOptions();
+        loadYears();
+        applyAccessControl();
+    }
+
+    private void applyAccessControl() {
+        Optional<TaiKhoan> currentUser = UserSession.getCurrentAccount();
+        if (currentUser.isEmpty()) return;
+
+        QuyenTruyCap role = currentUser.get().getQuyen();
+        
+        if (role == QuyenTruyCap.HOC_VIEN || role == QuyenTruyCap.PHU_HUYNH) {
+            scoreTable.setEditable(false);
+            saveButton.setVisible(false);
+            saveButton.setManaged(false);
+            saveDraftButton.setVisible(false);
+            saveDraftButton.setManaged(false);
+            downloadTemplateButton.setVisible(false);
+            downloadTemplateButton.setManaged(false);
+        }
     }
 
     private void configureTable() {
         scoreTable.setEditable(true);
-        scoreTable.setPlaceholder(new Label("Chọn lớp để hiển thị danh sách học viên"));
+        scoreTable.setPlaceholder(new Label("Chọn lớp để hiển thị danh sách học sinh"));
 
         studentIdColumn.setCellValueFactory(cell -> cell.getValue().studentIdProperty());
         studentNameColumn.setCellValueFactory(cell -> cell.getValue().studentNameProperty());
@@ -132,6 +168,9 @@ public class ScoreManagementController {
         makeEditableScoreColumn(regularScoreColumn, ScoreRow::regularScoreProperty, ScoreRow::setRegularScore);
         makeEditableScoreColumn(midtermScoreColumn, ScoreRow::midtermScoreProperty, ScoreRow::setMidtermScore);
         makeEditableScoreColumn(finalScoreColumn, ScoreRow::finalScoreProperty, ScoreRow::setFinalScore);
+
+        averageScoreColumn.setCellValueFactory(cell -> cell.getValue().averageScoreProperty());
+        averageScoreColumn.setCellFactory(col -> new TextFieldTableCell<>(new ScoreStringConverter()));
 
         filteredData = new FilteredList<>(masterData, row -> true);
         filteredData.addListener((ListChangeListener<ScoreRow>) change -> updateSummary());
@@ -144,6 +183,26 @@ public class ScoreManagementController {
     private void configureFilters() {
         scoreTable.getSelectionModel().setCellSelectionEnabled(true);
         searchField.textProperty().addListener((obs, oldValue, newValue) -> applySearchFilter(newValue));
+
+        yearFilter.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(NamHoc object) {
+                return object == null ? "" : object.getTenNamHoc();
+            }
+            @Override
+            public NamHoc fromString(String string) { return null; }
+        });
+        yearFilter.valueProperty().addListener((obs, oldVal, newVal) -> loadSemesters(newVal));
+
+        semesterFilter.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(HocKy object) {
+                return object == null ? "" : "Học kỳ " + object.getThuTuKy();
+            }
+            @Override
+            public HocKy fromString(String string) { return null; }
+        });
+        semesterFilter.valueProperty().addListener((obs, oldVal, newVal) -> loadClassOptions());
 
         formulaSelector.setItems(FXCollections.observableArrayList(ScoreFormulaPreset.values()));
         formulaSelector.setConverter(new StringConverter<>() {
@@ -160,6 +219,11 @@ public class ScoreManagementController {
                     }
                 }
                 return ScoreFormulaPreset.STANDARD;
+            }
+        });
+        formulaSelector.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                masterData.forEach(row -> row.updateAverage(newVal));
             }
         });
         formulaSelector.getSelectionModel().select(ScoreFormulaPreset.STANDARD);
@@ -213,9 +277,65 @@ public class ScoreManagementController {
         return roundTwoDecimals(clamped);
     }
 
-    private void loadClassOptions() {
+    private void loadYears() {
         try {
-            List<ScoreClassOption> options = scoreService.findClassOptions();
+            List<NamHoc> years = catalogService.getAllNamHoc();
+            yearFilter.setItems(FXCollections.observableArrayList(years));
+            if (!years.isEmpty()) {
+                yearFilter.getSelectionModel().selectFirst();
+            }
+        } catch (Exception ex) {
+            setStatus("Không thể tải danh sách năm học: " + ex.getMessage(), true);
+        }
+    }
+
+    private void loadSemesters(NamHoc year) {
+        if (year == null) {
+            semesterFilter.setItems(FXCollections.observableArrayList());
+            return;
+        }
+        try {
+            List<HocKy> semesters = catalogService.getHocKyByNamHoc(year.getMaNamHoc());
+            semesterFilter.setItems(FXCollections.observableArrayList(semesters));
+            if (!semesters.isEmpty()) {
+                semesterFilter.getSelectionModel().selectFirst();
+            } else {
+                loadClassOptions();
+            }
+        } catch (Exception ex) {
+            setStatus("Không thể tải danh sách học kỳ: " + ex.getMessage(), true);
+        }
+    }
+
+    private void loadClassOptions() {
+        HocKy semester = semesterFilter.getValue();
+        if (semester == null) {
+            allClassOptions.clear();
+            visibleClassOptions.clear();
+            return;
+        }
+        try {
+            List<ScoreClassOption> options;
+            Optional<TaiKhoan> currentUser = UserSession.getCurrentAccount();
+            
+            if (currentUser.isPresent()) {
+                TaiKhoan account = currentUser.get();
+                QuyenTruyCap role = account.getQuyen();
+                String username = account.getTenDangNhap();
+                
+                if (role == QuyenTruyCap.GIAO_VIEN) {
+                    options = scoreService.findClassOptionsForTeacher(semester.getMaHocKy(), username);
+                } else if (role == QuyenTruyCap.HOC_VIEN) {
+                    options = scoreService.findClassOptionsForStudent(semester.getMaHocKy(), username);
+                } else if (role == QuyenTruyCap.PHU_HUYNH) {
+                    options = scoreService.findClassOptionsForGuardian(semester.getMaHocKy(), username);
+                } else {
+                    options = scoreService.findClassOptions(semester.getMaHocKy());
+                }
+            } else {
+                options = scoreService.findClassOptions(semester.getMaHocKy());
+            }
+
             allClassOptions.setAll(options);
             visibleClassOptions.setAll(options);
             populateSubjectFilter(options);
@@ -265,15 +385,34 @@ public class ScoreManagementController {
 
     private void onClassSelected(ScoreClassOption option) {
         masterData.clear();
-        updateDirtyState();
-        if (option == null) {
-            updateSummary();
-            return;
-        }
+        if (option == null) return;
         try {
-            List<ScoreEntry> entries = scoreService.findScoresByClass(option.classId());
+            List<ScoreEntry> entries;
+            
+            Optional<TaiKhoan> currentUser = UserSession.getCurrentAccount();
+            if (currentUser.isPresent()) {
+                TaiKhoan account = currentUser.get();
+                QuyenTruyCap role = account.getQuyen();
+                String username = account.getTenDangNhap();
+                
+                if (role == QuyenTruyCap.HOC_VIEN) {
+                    entries = scoreService.findScoresByClassForStudent(option.classId(), username);
+                } else if (role == QuyenTruyCap.PHU_HUYNH) {
+                    entries = scoreService.findScoresByClassForGuardian(option.classId(), username);
+                } else {
+                    entries = scoreService.findScoresByClass(option.classId());
+                }
+            } else {
+                entries = scoreService.findScoresByClass(option.classId());
+            }
+
+            ScoreFormulaPreset currentFormula = formulaSelector.getValue();
             for (ScoreEntry entry : entries) {
-                masterData.add(new ScoreRow(entry.studentId(), entry.fullName(), entry.regularScore(), entry.midtermScore(), entry.finalScore()));
+                ScoreRow row = new ScoreRow(entry.studentId(), entry.fullName(), entry.regularScore(), entry.midtermScore(), entry.finalScore());
+                if (currentFormula != null) {
+                    row.updateAverage(currentFormula);
+                }
+                masterData.add(row);
             }
             updateDirtyState();
             applySearchFilter(searchField.getText());
@@ -300,12 +439,24 @@ public class ScoreManagementController {
 
     private void updateSummary() {
         int total = filteredData == null ? 0 : filteredData.size();
-        summaryLabel.setText("Hiển thị " + total + " học viên");
+        summaryLabel.setText("Hiển thị " + total + " học sinh");
     }
 
     @FXML
     private void handleDownloadTemplate() {
         exportCsv(false);
+    }
+
+    @FXML
+    public void handleReload() {
+        ScoreClassOption selected = classFilter.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            onClassSelected(selected);
+            setStatus("Đã tải lại dữ liệu.", false);
+        } else {
+            loadClassOptions();
+            setStatus("Đã tải lại danh sách lớp.", false);
+        }
     }
 
     @FXML
@@ -485,12 +636,14 @@ public class ScoreManagementController {
         private final ObjectProperty<Double> regularScore = new SimpleObjectProperty<>(this, "regularScore");
         private final ObjectProperty<Double> midtermScore = new SimpleObjectProperty<>(this, "midtermScore");
         private final ObjectProperty<Double> finalScore = new SimpleObjectProperty<>(this, "finalScore");
+        private final ObjectProperty<Double> averageScore = new SimpleObjectProperty<>(this, "averageScore");
         private final BooleanProperty dirty = new SimpleBooleanProperty(this, "dirty", false);
         private final String normalizedId;
         private final String normalizedName;
         private Double originalRegular;
         private Double originalMidterm;
         private Double originalFinal;
+        private ScoreFormulaPreset lastFormula;
 
         ScoreRow(String studentId, String studentName, Double regular, Double midterm, Double finalScore) {
             this.studentId.set(Objects.requireNonNull(studentId, "studentId"));
@@ -501,6 +654,15 @@ public class ScoreManagementController {
             this.midtermScore.set(midterm == null ? null : clampScore(midterm));
             this.finalScore.set(finalScore == null ? null : clampScore(finalScore));
             markPersisted();
+        }
+
+        void updateAverage(ScoreFormulaPreset formula) {
+            this.lastFormula = formula;
+            if (formula == null) {
+                averageScore.set(null);
+                return;
+            }
+            averageScore.set(formula.calculate(regularScore.get(), midtermScore.get(), finalScore.get()));
         }
 
         StringProperty studentIdProperty() {
@@ -523,19 +685,26 @@ public class ScoreManagementController {
             return finalScore;
         }
 
+        ObjectProperty<Double> averageScoreProperty() {
+            return averageScore;
+        }
+
         void setRegularScore(Double value) {
             regularScore.set(value == null ? null : clampScore(value));
             updateDirty();
+            if (lastFormula != null) updateAverage(lastFormula);
         }
 
         void setMidtermScore(Double value) {
             midtermScore.set(value == null ? null : clampScore(value));
             updateDirty();
+            if (lastFormula != null) updateAverage(lastFormula);
         }
 
         void setFinalScore(Double value) {
             finalScore.set(value == null ? null : clampScore(value));
             updateDirty();
+            if (lastFormula != null) updateAverage(lastFormula);
         }
 
         Double getRegularScore() {

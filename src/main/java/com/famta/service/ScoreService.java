@@ -17,12 +17,28 @@ public interface ScoreService {
     List<ScoreClassOption> findClassOptions();
 
     /**
+     * Loads the list of classes for a specific semester.
+     *
+     * @param semesterId the semester ID to filter by
+     * @return list of class options ordered by display name
+     */
+    List<ScoreClassOption> findClassOptions(String semesterId);
+
+    List<ScoreClassOption> findClassOptionsForTeacher(String semesterId, String teacherId);
+    List<ScoreClassOption> findClassOptionsForStudent(String semesterId, String studentId);
+    List<ScoreClassOption> findClassOptionsForGuardian(String semesterId, String guardianId);
+
+    /**
      * Fetches existing score entries for a class.
      *
      * @param classId the class identifier
      * @return list of score rows, possibly empty when the class has no students yet
      */
     List<ScoreEntry> findScoresByClass(String classId);
+
+    List<ScoreEntry> findScoresByClassForGuardian(String classId, String guardianId);
+    
+    List<ScoreEntry> findScoresByClassForStudent(String classId, String studentId);
 
     /**
      * Persists the scores for a student within a class. Implementations
