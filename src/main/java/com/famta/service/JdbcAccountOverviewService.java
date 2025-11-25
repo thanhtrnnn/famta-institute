@@ -109,7 +109,7 @@ public class JdbcAccountOverviewService implements AccountOverviewService {
                 }
             }
         } catch (SQLException ex) {
-            throw new IllegalStateException("Không thể tải danh sách học viên theo lớp", ex);
+            throw new IllegalStateException("Không thể tải danh sách học sinh theo lớp", ex);
         }
         return rows;
     }

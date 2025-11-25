@@ -1,11 +1,13 @@
 package com.famta.service;
 
 import com.famta.database.DatabaseManager;
+import com.famta.model.HocKy;
 import com.famta.model.Khoa;
 import com.famta.model.LoaiPhongHoc;
 import com.famta.model.MonHoc;
 import com.famta.model.NamHoc;
 import com.famta.model.PhongHoc;
+import com.famta.model.TietHoc;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -34,6 +36,59 @@ public class JdbcCatalogService {
             }
         }
         return list;
+    }
+
+    public List<HocKy> getHocKyByNamHoc(String maNamHoc) throws SQLException {
+        List<HocKy> list = new ArrayList<>();
+        String sql = "SELECT * FROM HOCKY WHERE MaNamHoc = ? ORDER BY ThuTuKy DESC";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            stmt.setString(1, maNamHoc);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    NamHoc nh = new NamHoc(maNamHoc, "", null, null);
+                    HocKy hk = new HocKy(
+                        rs.getString("MaHocKy"),
+                        rs.getInt("ThuTuKy"),
+                        rs.getDate("NgayBatDau").toLocalDate(),
+                        rs.getDate("NgayKetThuc").toLocalDate(),
+                        nh
+                    );
+                    list.add(hk);
+                }
+            }
+        }
+        return list;
+    }
+
+    public void createHocKy(HocKy hk) throws SQLException {
+        String sql = "INSERT INTO HOCKY (MaHocKy, ThuTuKy, NgayBatDau, NgayKetThuc, MaNamHoc) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            stmt.setString(1, hk.getMaHocKy());
+            stmt.setInt(2, hk.getThuTuKy());
+            stmt.setDate(3, Date.valueOf(hk.getNgayBatDau()));
+            stmt.setDate(4, Date.valueOf(hk.getNgayKetThuc()));
+            stmt.setString(5, hk.getNamHoc().getMaNamHoc());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void updateHocKy(HocKy hk) throws SQLException {
+        String sql = "UPDATE HOCKY SET ThuTuKy=?, NgayBatDau=?, NgayKetThuc=? WHERE MaHocKy=?";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, hk.getThuTuKy());
+            stmt.setDate(2, Date.valueOf(hk.getNgayBatDau()));
+            stmt.setDate(3, Date.valueOf(hk.getNgayKetThuc()));
+            stmt.setString(4, hk.getMaHocKy());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void deleteHocKy(String maHocKy) throws SQLException {
+        String sql = "DELETE FROM HOCKY WHERE MaHocKy=?";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            stmt.setString(1, maHocKy);
+            stmt.executeUpdate();
+        }
     }
 
     public void createNamHoc(NamHoc nh) throws SQLException {
@@ -222,5 +277,25 @@ public class JdbcCatalogService {
             stmt.setString(1, maPhongHoc);
             stmt.executeUpdate();
         }
+    }
+
+    // --- TIETHOC ---
+    public List<TietHoc> getAllTietHoc() throws SQLException {
+        List<TietHoc> list = new ArrayList<>();
+        String sql = "SELECT * FROM TIETHOC ORDER BY MaTietHoc";
+        try (Statement stmt = getConnection().createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                TietHoc th = new TietHoc(
+                    rs.getString("MaTietHoc"),
+                    rs.getString("TenTietHoc"),
+                    rs.getTime("ThoiGianBatDau").toLocalTime(),
+                    rs.getTime("ThoiGianKetThuc").toLocalTime(),
+                    null
+                );
+                list.add(th);
+            }
+        }
+        return list;
     }
 }
