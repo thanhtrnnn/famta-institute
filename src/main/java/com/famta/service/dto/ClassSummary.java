@@ -11,6 +11,7 @@ public record ClassSummary(
     String giaoVien,
     String khoi,
     String namHoc,
+    int hocKy,
     String monHoc,
     String tietBatDau,
     String tietKetThuc,

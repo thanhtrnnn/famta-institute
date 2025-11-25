@@ -23,6 +23,44 @@ public class JdbcScoreService implements ScoreService {
         ORDER BY l.TenLopHoc
         """;
 
+    private static final String CLASS_BY_SEMESTER_SQL = """
+        SELECT l.MaLopHoc, l.TenLopHoc, m.MaMonHoc, m.TenMonHoc
+        FROM LOPHOC l
+        LEFT JOIN MONHOC m ON m.MaMonHoc = l.MaMonHoc
+        WHERE l.MaHocKy = ?
+        ORDER BY l.TenLopHoc
+        """;
+
+    private static final String CLASS_BY_TEACHER_SQL = """
+        SELECT l.MaLopHoc, l.TenLopHoc, m.MaMonHoc, m.TenMonHoc
+        FROM LOPHOC l
+        LEFT JOIN MONHOC m ON m.MaMonHoc = l.MaMonHoc
+        INNER JOIN GIAOVIEN gv ON gv.MaGiaoVien = l.MaGiaoVien
+        WHERE l.MaHocKy = ? AND gv.TenDangNhap = ?
+        ORDER BY l.TenLopHoc
+        """;
+
+    private static final String CLASS_BY_STUDENT_SQL = """
+        SELECT l.MaLopHoc, l.TenLopHoc, m.MaMonHoc, m.TenMonHoc
+        FROM LOPHOC l
+        LEFT JOIN MONHOC m ON m.MaMonHoc = l.MaMonHoc
+        INNER JOIN HOCSINH_LOPHOC hsl ON hsl.MaLopHoc = l.MaLopHoc
+        INNER JOIN HOCSINH hs ON hs.MaHocSinh = hsl.MaHocSinh
+        WHERE l.MaHocKy = ? AND hs.TenDangNhap = ?
+        ORDER BY l.TenLopHoc
+        """;
+
+    private static final String CLASS_BY_GUARDIAN_SQL = """
+        SELECT DISTINCT l.MaLopHoc, l.TenLopHoc, m.MaMonHoc, m.TenMonHoc
+        FROM LOPHOC l
+        LEFT JOIN MONHOC m ON m.MaMonHoc = l.MaMonHoc
+        INNER JOIN HOCSINH_LOPHOC hsl ON hsl.MaLopHoc = l.MaLopHoc
+        INNER JOIN HOCSINH_NGUOIGIAMHO nghs ON nghs.MaHocSinh = hsl.MaHocSinh
+        INNER JOIN NGUOIGIAMHO ngh ON ngh.MaNguoiGiamHo = nghs.MaNguoiGiamHo
+        WHERE l.MaHocKy = ? AND ngh.TenDangNhap = ?
+        ORDER BY l.TenLopHoc
+        """;
+
     private static final String SCORE_SQL = """
         SELECT hs.MaHocSinh,
                LTRIM(RTRIM(CONCAT(
@@ -36,6 +74,40 @@ public class JdbcScoreService implements ScoreService {
         FROM HOCSINH_LOPHOC hsl
         INNER JOIN HOCSINH hs ON hs.MaHocSinh = hsl.MaHocSinh
         WHERE hsl.MaLopHoc = ?
+        ORDER BY hs.Ho, hs.TenLot, hs.Ten, hs.MaHocSinh
+        """;
+
+    private static final String SCORE_BY_GUARDIAN_SQL = """
+        SELECT hs.MaHocSinh,
+               LTRIM(RTRIM(CONCAT(
+                    COALESCE(hs.Ho, ''),
+                    CASE WHEN hs.TenLot IS NULL OR hs.TenLot = '' THEN '' ELSE ' ' + hs.TenLot END,
+                    CASE WHEN hs.Ten IS NULL OR hs.Ten = '' THEN '' ELSE ' ' + hs.Ten END
+               ))) AS HoTen,
+               hsl.DiemThuongXuyen,
+               hsl.DiemGiuaKy,
+               hsl.DiemCuoiKy
+        FROM HOCSINH_LOPHOC hsl
+        INNER JOIN HOCSINH hs ON hs.MaHocSinh = hsl.MaHocSinh
+        INNER JOIN HOCSINH_NGUOIGIAMHO nghs ON nghs.MaHocSinh = hs.MaHocSinh
+        INNER JOIN NGUOIGIAMHO ngh ON ngh.MaNguoiGiamHo = nghs.MaNguoiGiamHo
+        WHERE hsl.MaLopHoc = ? AND ngh.TenDangNhap = ?
+        ORDER BY hs.Ho, hs.TenLot, hs.Ten, hs.MaHocSinh
+        """;
+
+    private static final String SCORE_BY_STUDENT_SQL = """
+        SELECT hs.MaHocSinh,
+               LTRIM(RTRIM(CONCAT(
+                    COALESCE(hs.Ho, ''),
+                    CASE WHEN hs.TenLot IS NULL OR hs.TenLot = '' THEN '' ELSE ' ' + hs.TenLot END,
+                    CASE WHEN hs.Ten IS NULL OR hs.Ten = '' THEN '' ELSE ' ' + hs.Ten END
+               ))) AS HoTen,
+               hsl.DiemThuongXuyen,
+               hsl.DiemGiuaKy,
+               hsl.DiemCuoiKy
+        FROM HOCSINH_LOPHOC hsl
+        INNER JOIN HOCSINH hs ON hs.MaHocSinh = hsl.MaHocSinh
+        WHERE hsl.MaLopHoc = ? AND hs.TenDangNhap = ?
         ORDER BY hs.Ho, hs.TenLot, hs.Ten, hs.MaHocSinh
         """;
 
@@ -69,6 +141,77 @@ public class JdbcScoreService implements ScoreService {
     }
 
     @Override
+    public List<ScoreClassOption> findClassOptions(String semesterId) {
+        List<ScoreClassOption> options = new ArrayList<>();
+        Connection connection = databaseManager.getConnection();
+        try (PreparedStatement ps = connection.prepareStatement(CLASS_BY_SEMESTER_SQL)) {
+            ps.setString(1, semesterId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    options.add(mapClass(rs));
+                }
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException("Không thể tải danh sách lớp cho học kỳ " + semesterId, ex);
+        }
+        return options;
+    }
+
+    @Override
+    public List<ScoreClassOption> findClassOptionsForTeacher(String semesterId, String teacherId) {
+        List<ScoreClassOption> options = new ArrayList<>();
+        Connection connection = databaseManager.getConnection();
+        try (PreparedStatement ps = connection.prepareStatement(CLASS_BY_TEACHER_SQL)) {
+            ps.setString(1, semesterId);
+            ps.setString(2, teacherId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    options.add(mapClass(rs));
+                }
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException("Không thể tải danh sách lớp cho giáo viên " + teacherId, ex);
+        }
+        return options;
+    }
+
+    @Override
+    public List<ScoreClassOption> findClassOptionsForStudent(String semesterId, String studentId) {
+        List<ScoreClassOption> options = new ArrayList<>();
+        Connection connection = databaseManager.getConnection();
+        try (PreparedStatement ps = connection.prepareStatement(CLASS_BY_STUDENT_SQL)) {
+            ps.setString(1, semesterId);
+            ps.setString(2, studentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    options.add(mapClass(rs));
+                }
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException("Không thể tải danh sách lớp cho học sinh " + studentId, ex);
+        }
+        return options;
+    }
+
+    @Override
+    public List<ScoreClassOption> findClassOptionsForGuardian(String semesterId, String guardianId) {
+        List<ScoreClassOption> options = new ArrayList<>();
+        Connection connection = databaseManager.getConnection();
+        try (PreparedStatement ps = connection.prepareStatement(CLASS_BY_GUARDIAN_SQL)) {
+            ps.setString(1, semesterId);
+            ps.setString(2, guardianId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    options.add(mapClass(rs));
+                }
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException("Không thể tải danh sách lớp cho phụ huynh " + guardianId, ex);
+        }
+        return options;
+    }
+
+    @Override
     public List<ScoreEntry> findScoresByClass(String classId) {
         if (classId == null || classId.isBlank()) {
             return List.of();
@@ -84,6 +227,48 @@ public class JdbcScoreService implements ScoreService {
             }
         } catch (SQLException ex) {
             throw new IllegalStateException("Không thể tải bảng điểm cho lớp " + classId, ex);
+        }
+        return scores;
+    }
+
+    @Override
+    public List<ScoreEntry> findScoresByClassForGuardian(String classId, String guardianId) {
+        if (classId == null || classId.isBlank()) {
+            return List.of();
+        }
+        List<ScoreEntry> scores = new ArrayList<>();
+        Connection connection = databaseManager.getConnection();
+        try (PreparedStatement ps = connection.prepareStatement(SCORE_BY_GUARDIAN_SQL)) {
+            ps.setString(1, classId.trim());
+            ps.setString(2, guardianId.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    scores.add(mapScore(rs));
+                }
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException("Không thể tải bảng điểm cho lớp " + classId + " cho phụ huynh " + guardianId, ex);
+        }
+        return scores;
+    }
+
+    @Override
+    public List<ScoreEntry> findScoresByClassForStudent(String classId, String studentId) {
+        if (classId == null || classId.isBlank()) {
+            return List.of();
+        }
+        List<ScoreEntry> scores = new ArrayList<>();
+        Connection connection = databaseManager.getConnection();
+        try (PreparedStatement ps = connection.prepareStatement(SCORE_BY_STUDENT_SQL)) {
+            ps.setString(1, classId.trim());
+            ps.setString(2, studentId.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    scores.add(mapScore(rs));
+                }
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException("Không thể tải bảng điểm cho lớp " + classId + " cho học sinh " + studentId, ex);
         }
         return scores;
     }
@@ -115,7 +300,7 @@ public class JdbcScoreService implements ScoreService {
                 }
             }
         } catch (SQLException ex) {
-            throw new IllegalStateException("Không thể lưu điểm cho học viên " + studentId, ex);
+            throw new IllegalStateException("Không thể lưu điểm cho học sinh " + studentId, ex);
         }
     }
 
