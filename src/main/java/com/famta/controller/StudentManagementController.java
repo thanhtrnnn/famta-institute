@@ -1,11 +1,19 @@
 package com.famta.controller;
 
 import com.famta.model.HocSinh;
+import com.famta.model.QuyenTruyCap;
+import com.famta.model.TaiKhoan;
 import com.famta.service.HocVienService;
+import com.famta.service.JdbcClassService;
+import com.famta.service.JdbcGuardianService;
+import com.famta.service.JdbcHocVienService;
 import com.famta.service.ServiceProvider;
+import com.famta.service.dto.ClassSummary;
+import com.famta.session.UserSession;
 import com.famta.util.SequentialIdGenerator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -34,6 +42,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 
 public class StudentManagementController {
 
@@ -42,12 +51,17 @@ public class StudentManagementController {
     private static final int STUDENT_ID_WIDTH = 8;
 
     private final HocVienService hocVienService = ServiceProvider.getHocVienService();
+    private final JdbcClassService classService = new JdbcClassService();
+    private final JdbcGuardianService guardianService = new JdbcGuardianService();
 
     private final ObservableList<HocSinh> masterData = FXCollections.observableArrayList();
     private FilteredList<HocSinh> filteredData;
 
     @FXML
     private TextField searchField;
+
+    @FXML
+    private ComboBox<ClassSummary> classFilter;
 
     @FXML
     private ComboBox<String> genderFilter;
@@ -57,6 +71,9 @@ public class StudentManagementController {
 
     @FXML
     private Button addStudentButton;
+    
+    @FXML
+    private Button deleteStudentButton;
 
     @FXML
     private Button resetButton;
@@ -86,14 +103,108 @@ public class StudentManagementController {
     private Label placeholderMessage;
 
     @FXML
+    private Label formTitle;
+
+    @FXML
+    private Label formStatus;
+
+    @FXML
+    private TextField maHocSinhField;
+
+    @FXML
+    private TextField hoField;
+
+    @FXML
+    private TextField tenLotField;
+
+    @FXML
+    private TextField tenField;
+
+    @FXML
+    private ComboBox<String> gioiTinhBox;
+
+    @FXML
+    private DatePicker ngaySinhPicker;
+
+    @FXML
+    private DatePicker ngayNhapHocPicker;
+
+    @FXML
     private void initialize() {
         configureTable();
+        configureForm();
         loadData();
         configureFilters();
         hookListeners();
         placeholderMessage.setVisible(false);
         applyFilters();
+        applyAccessControl();
     }
+
+    private void applyAccessControl() {
+        Optional<TaiKhoan> currentUser = UserSession.getCurrentAccount();
+        if (currentUser.isEmpty()) return;
+
+        QuyenTruyCap role = currentUser.get().getQuyen();
+        
+        // Disable editing for non-admins
+        if (role != QuyenTruyCap.ADMIN) {
+            addStudentButton.setVisible(false);
+            addStudentButton.setManaged(false);
+            deleteStudentButton.setVisible(false);
+            deleteStudentButton.setManaged(false);
+            // Also disable the form fields if they are visible
+            maHocSinhField.setDisable(true);
+            hoField.setDisable(true);
+            tenLotField.setDisable(true);
+            tenField.setDisable(true);
+            ngaySinhPicker.setDisable(true);
+            ngayNhapHocPicker.setDisable(true);
+            gioiTinhBox.setDisable(true);
+            // Hide save/cancel buttons if they exist in the FXML (not shown in snippet but good practice)
+        }
+    }
+
+    private void configureForm() {
+        gioiTinhBox.setItems(FXCollections.observableArrayList("Nam", "Nữ", "Khác"));
+        clearForm();
+        studentTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                populateForm(newVal);
+            }
+        });
+    }
+
+    private void clearForm() {
+        maHocSinhField.clear();
+        hoField.clear();
+        tenLotField.clear();
+        tenField.clear();
+        gioiTinhBox.setValue(null);
+        ngaySinhPicker.setValue(null);
+        ngayNhapHocPicker.setValue(LocalDate.now());
+        formTitle.setText("Thêm học sinh mới");
+        formStatus.setText("");
+        studentTable.getSelectionModel().clearSelection();
+    }
+
+    private void populateForm(HocSinh hs) {
+        maHocSinhField.setText(hs.getMaHocSinh());
+        hoField.setText(hs.getHo());
+        tenLotField.setText(hs.getTenLot());
+        tenField.setText(hs.getTen());
+        gioiTinhBox.setValue(hs.getGioiTinh()); // Assuming getter exists or I need to check model
+        // HocSinh model has getGioiTinh() returning String? Yes.
+        // But wait, HocSinh.java showed `private String gioiTinh;`
+        // Let's check getters in HocSinh.java again.
+        // It has `getGioiTinh()`.
+        // What about dates? `getNgaySinh()` returns LocalDate.
+        ngaySinhPicker.setValue(hs.getNgaySinh());
+        ngayNhapHocPicker.setValue(hs.getNgayNhapHoc());
+        formTitle.setText("Cập nhật thông tin");
+        formStatus.setText("");
+    }
+
 
     private void configureTable() {
         // Use PropertyValueFactory for static columns that map directly to model methods.
@@ -112,7 +223,7 @@ public class StudentManagementController {
             hideMessage();
         } catch (Exception ex) {
             masterData.clear();
-            showMessage("Không thể tải dữ liệu học viên. Vui lòng kiểm tra kết nối cơ sở dữ liệu.", "error-message");
+            showMessage("Không thể tải dữ liệu học sinh. Vui lòng kiểm tra kết nối cơ sở dữ liệu.", "error-message");
         }
         filteredData = new FilteredList<>(masterData, hocSinh -> true);
         SortedList<HocSinh> sortedData = new SortedList<>(filteredData);
@@ -144,6 +255,47 @@ public class StudentManagementController {
         years.addAll(enrollmentYears);
         enrollmentYearFilter.setItems(years);
         enrollmentYearFilter.getSelectionModel().selectFirst();
+        
+        // Class Filter
+        try {
+            List<ClassSummary> classes = classService.fetchClassSummaries();
+            classFilter.setItems(FXCollections.observableArrayList(classes));
+            classFilter.setConverter(new StringConverter<ClassSummary>() {
+                @Override
+                public String toString(ClassSummary object) {
+                    return object == null ? "Tất cả" : object.tenLopHoc();
+                }
+
+                @Override
+                public ClassSummary fromString(String string) {
+                    return null;
+                }
+            });
+            classFilter.valueProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal != null) {
+                    loadStudentsByClass(newVal.maLopHoc());
+                } else {
+                    loadData(); // Reload all if cleared
+                    applyFilters();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void loadStudentsByClass(String maLopHoc) {
+        if (hocVienService instanceof JdbcHocVienService) {
+            try {
+                List<HocSinh> students = ((JdbcHocVienService) hocVienService).getHocVienByClass(maLopHoc);
+                masterData.setAll(students);
+                // Re-apply other filters locally
+                applyFilters();
+                refreshSummary();
+            } catch (Exception ex) {
+                showMessage("Lỗi tải danh sách lớp: " + ex.getMessage(), "error-message");
+            }
+        }
     }
 
     private void hookListeners() {
@@ -196,7 +348,7 @@ public class StudentManagementController {
     }
 
     private void refreshSummary() {
-        resultsSummary.setText("Hiển thị " + filteredData.size() + " học viên");
+        resultsSummary.setText("Hiển thị " + filteredData.size() + " học sinh");
     }
 
     private String normalize(String value) {
@@ -213,47 +365,96 @@ public class StudentManagementController {
 
     @FXML
     private void handleAddStudent() {
-        Optional<StudentFormData> formData = showStudentDialog();
-        formData.ifPresent(data -> {
-            HocSinh hocSinh = new HocSinh(
-                data.id(),
-                data.lastName(),
-                data.middleName(),
-                data.firstName(),
-                data.birthDate(),
-                data.gender(),
-                data.enrollmentDate()
-            );
-            try {
-                boolean inserted = hocVienService.addHocVien(hocSinh);
-                if (inserted) {
-                    masterData.add(hocSinh);
-                    applyFilters();
-                    studentTable.getSelectionModel().select(hocSinh);
-                    studentTable.scrollTo(hocSinh);
-                    showMessage("Đã thêm học viên " + hocSinh.getHoTenDayDu(), "success-message");
-                } else {
-                    showMessage("Mã học viên " + hocSinh.getMaHocSinh() + " đã tồn tại.", "error-message");
-                }
-            } catch (Exception ex) {
-                showMessage("Không thể thêm học viên: " + ex.getMessage(), "error-message");
+        clearForm();
+        maHocSinhField.setText(suggestStudentId());
+        hoField.requestFocus();
+    }
+
+    @FXML
+    private void handleEditStudent() {
+        HocSinh selected = studentTable.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            populateForm(selected);
+        } else {
+            showMessage("Vui lòng chọn học sinh để sửa", "warning-message");
+        }
+    }
+
+    @FXML
+    private void handleDeleteStudent() {
+        HocSinh selected = studentTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showMessage("Vui lòng chọn học sinh để xóa", "warning-message");
+            return;
+        }
+        try {
+            if (hocVienService.deleteHocVien(selected.getMaHocSinh())) {
+                masterData.remove(selected);
+                clearForm();
+                showMessage("Đã xóa học sinh " + selected.getHo() + " " + selected.getTen(), "success-message");
+            } else {
+                showMessage("Không thể xóa học sinh từ CSDL", "error-message");
             }
-        });
+        } catch (Exception ex) {
+            showMessage("Không thể xóa: " + ex.getMessage(), "error-message");
+        }
     }
 
     @FXML
-    private void handleImportCsv() {
-        showMessage("Chức năng nhập CSV sẽ sớm có mặt", "warning-message");
+    private void handleSaveStudent() {
+        String id = maHocSinhField.getText();
+        String ho = hoField.getText();
+        String tenLot = tenLotField.getText();
+        String ten = tenField.getText();
+        String gioiTinh = gioiTinhBox.getValue();
+        LocalDate ngaySinh = ngaySinhPicker.getValue();
+        LocalDate ngayNhapHoc = ngayNhapHocPicker.getValue();
+
+        if (id == null || id.isBlank()) {
+            formStatus.setText("Thiếu mã học sinh");
+            return;
+        }
+        if (ho == null || ho.isBlank() || ten == null || ten.isBlank()) {
+            formStatus.setText("Vui lòng nhập họ và tên");
+            return;
+        }
+
+        try {
+            HocSinh hs = new HocSinh(id, ho, tenLot, ten, ngaySinh, gioiTinh, ngayNhapHoc);
+            Optional<HocSinh> existing = masterData.stream().filter(h -> h.getMaHocSinh().equals(id)).findFirst();
+            if (existing.isPresent()) {
+                if (hocVienService.updateHocVien(hs)) {
+                    int index = masterData.indexOf(existing.get());
+                    masterData.set(index, hs);
+                    showMessage("Đã cập nhật học sinh", "success-message");
+                } else {
+                    formStatus.setText("Lỗi: Không thể cập nhật vào CSDL");
+                    return;
+                }
+            } else {
+                if (hocVienService.addHocVien(hs)) {
+                    masterData.add(hs);
+                    showMessage("Đã thêm học sinh mới", "success-message");
+                } else {
+                    formStatus.setText("Lỗi: Không thể thêm vào CSDL");
+                    return;
+                }
+            }
+            clearForm();
+        } catch (Exception ex) {
+            formStatus.setText("Lỗi: " + ex.getMessage());
+        }
     }
 
     @FXML
-    private void handleExportList() {
-        showMessage("Đang chuẩn bị xuất danh sách học viên", "info-text");
+    private void handleCancelEdit() {
+        clearForm();
     }
 
     @FXML
     private void handleResetFilters() {
         searchField.clear();
+        classFilter.getSelectionModel().clearSelection();
         genderFilter.getSelectionModel().selectFirst();
         enrollmentYearFilter.getSelectionModel().selectFirst();
         applyFilters();
@@ -276,8 +477,8 @@ public class StudentManagementController {
 
     private Optional<StudentFormData> showStudentDialog() {
         Dialog<StudentFormData> dialog = new Dialog<>();
-        dialog.setTitle("Thêm học viên");
-        dialog.setHeaderText("Điền thông tin học viên mới");
+        dialog.setTitle("Thêm học sinh");
+        dialog.setHeaderText("Điền thông tin học sinh mới");
         if (studentTable.getScene() != null) {
             dialog.initOwner(studentTable.getScene().getWindow());
         }
@@ -299,7 +500,7 @@ public class StudentManagementController {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.addRow(0, new Label("Mã học viên"), idField);
+        grid.addRow(0, new Label("Mã học sinh"), idField);
         grid.addRow(1, new Label("Họ"), lastNameField);
         grid.addRow(2, new Label("Tên lót"), middleNameField);
         grid.addRow(3, new Label("Tên"), firstNameField);
@@ -364,10 +565,10 @@ public class StudentManagementController {
 
     private String validateStudentForm(String id, String lastName, String firstName, LocalDate birthDate, LocalDate enrollDate) {
         if (id == null || id.isBlank()) {
-            return "Vui lòng nhập mã học viên";
+            return "Vui lòng nhập mã học sinh";
         }
         if (id.trim().length() != STUDENT_ID_PREFIX.length() + STUDENT_ID_WIDTH) {
-            return "Mã học viên phải có dạng " + STUDENT_ID_PREFIX + " + " + STUDENT_ID_WIDTH + " chữ số";
+            return "Mã học sinh phải có dạng " + STUDENT_ID_PREFIX + " + " + STUDENT_ID_WIDTH + " chữ số";
         }
         if (lastName == null || lastName.isBlank()) {
             return "Vui lòng nhập họ";
@@ -404,7 +605,7 @@ public class StudentManagementController {
         try {
             return SequentialIdGenerator.nextId("HOCSINH", "MaHocSinh", STUDENT_ID_PREFIX, STUDENT_ID_WIDTH);
         } catch (Exception ex) {
-            System.err.println("Không thể sinh mã học viên: " + ex.getMessage());
+            System.err.println("Không thể sinh mã học sinh: " + ex.getMessage());
             return "";
         }
     }
@@ -417,7 +618,7 @@ public class StudentManagementController {
     }
 
     private Label createTablePlaceholder() {
-        Label label = new Label("Không có học viên nào phù hợp");
+        Label label = new Label("Không có học sinh nào phù hợp");
         label.getStyleClass().add("error-text");
         return label;
     }
