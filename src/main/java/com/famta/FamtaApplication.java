@@ -9,6 +9,7 @@ import com.famta.session.UserSession;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -25,6 +26,13 @@ public class FamtaApplication extends Application {
     @Override
     public void start(Stage stage) {
         this.primaryStage = stage;
+        try {
+            // Using PNG for better compatibility with JavaFX
+            stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/famta-transparent.png")));
+        } catch (Exception e) {
+            System.err.println("Could not load icon: " + e.getMessage());
+            e.printStackTrace();
+        }
         stage.setTitle("FAMTA Institute Management System");
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         authService = new AuthService(databaseManager);
@@ -60,8 +68,7 @@ public class FamtaApplication extends Application {
             MainController controller = loader.getController();
             controller.initializeSession(account, this::showLoginScene);
             primaryStage.setScene(scene);
-            primaryStage.setMinWidth(800);
-            primaryStage.setMinHeight(600);
+            primaryStage.setMaximized(true);
             primaryStage.setResizable(true);
             primaryStage.centerOnScreen();
         } catch (IOException ex) {
@@ -71,6 +78,7 @@ public class FamtaApplication extends Application {
 
     private void applyStyles(Scene scene) {
         scene.getStylesheets().add(getClass().getResource("/css/application.css").toExternalForm());
+        com.famta.util.ThemeManager.applyTheme(scene);
     }
 
     public static void main(String[] args) {
