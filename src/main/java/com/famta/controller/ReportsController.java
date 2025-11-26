@@ -1,13 +1,23 @@
 package com.famta.controller;
 
+import com.famta.model.HocKy;
+import com.famta.model.NamHoc;
+import com.famta.service.JdbcCatalogService;
 import com.famta.service.JdbcReportDocumentService;
 import com.famta.service.JdbcReportService;
 import com.famta.service.dto.ReportClassOption;
 import com.famta.service.dto.ReportSummary;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -17,7 +27,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.layout.StackPane;
 import javafx.util.StringConverter;
+import javafx.util.converter.IntegerStringConverter;
 
 /**
  * Controller that powers the reports dashboard view.
@@ -28,16 +40,22 @@ public class ReportsController {
     private ComboBox<ReportType> reportCombo;
 
     @FXML
+    private ComboBox<NamHoc> yearFilter;
+
+    @FXML
+    private ComboBox<HocKy> semesterFilter;
+
+    @FXML
     private ComboBox<ReportClassOption> classCombo;
+
+    @FXML
+    private TextField thresholdField;
 
     @FXML
     private DatePicker fromDatePicker;
 
     @FXML
     private DatePicker toDatePicker;
-
-    @FXML
-    private TextField thresholdField;
 
     @FXML
     private Label studentValue;
@@ -47,6 +65,9 @@ public class ReportsController {
 
     @FXML
     private Label teacherValue;
+
+    @FXML
+    private StackPane chartContainer;
 
     @FXML
     private Label chartDescription;
@@ -65,11 +86,12 @@ public class ReportsController {
 
     private final JdbcReportService reportService = new JdbcReportService();
     private final JdbcReportDocumentService documentService = new JdbcReportDocumentService();
+    private final JdbcCatalogService catalogService = new JdbcCatalogService();
 
     @FXML
     private void initialize() {
         setupFilters();
-        loadClassOptions();
+        loadYears();
         refreshOverview();
     }
 
@@ -101,10 +123,86 @@ public class ReportsController {
             reportPreview.setText(content);
             copyButton.setDisable(content == null || content.isBlank());
             setReportStatus("Đã tạo báo cáo: " + type.displayName, false);
+            
+            generateChart(type);
         } catch (Exception ex) {
             reportPreview.clear();
             copyButton.setDisable(true);
             setReportStatus("Không thể tạo báo cáo: " + ex.getMessage(), true);
+            chartContainer.getChildren().clear();
+            chartContainer.getChildren().add(new Label("Không thể tạo biểu đồ: " + ex.getMessage()));
+        }
+    }
+
+    private void generateChart(ReportType type) {
+        chartContainer.getChildren().clear();
+        
+        switch (type) {
+            case STUDENT_ROSTER -> {
+                CategoryAxis xAxis = new CategoryAxis();
+                xAxis.setLabel("Lớp học");
+                NumberAxis yAxis = new NumberAxis();
+                yAxis.setLabel("Số lượng học sinh");
+                yAxis.setTickLabelFormatter(new IntegerStringConverter());
+                BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+                barChart.setTitle("Phân bố học sinh theo lớp");
+                barChart.setLegendVisible(false);
+                
+                XYChart.Series<String, Number> series = new XYChart.Series<>();
+                Map<String, Integer> data = reportService.getStudentsPerClass();
+                data.forEach((k, v) -> series.getData().add(new XYChart.Data<>(k, v)));
+                
+                barChart.getData().add(series);
+                chartContainer.getChildren().add(barChart);
+            }
+            case CLASS_SCORE -> {
+                ReportClassOption option = classCombo.getValue();
+                if (option != null) {
+                    CategoryAxis xAxis = new CategoryAxis();
+                    xAxis.setLabel("Phân loại điểm");
+                    NumberAxis yAxis = new NumberAxis();
+                    yAxis.setLabel("Số lượng");
+                    yAxis.setTickUnit(1);
+                    yAxis.setMinorTickVisible(false);
+                    BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+                    barChart.setTitle("Phổ điểm lớp " + option.name());
+                    barChart.setLegendVisible(false);
+                    
+                    XYChart.Series<String, Number> series = new XYChart.Series<>();
+                    Map<String, Integer> data = reportService.getScoreDistribution(option.id());
+                    data.forEach((k, v) -> series.getData().add(new XYChart.Data<>(k, v)));
+                    
+                    barChart.getData().add(series);
+                    chartContainer.getChildren().add(barChart);
+                }
+            }
+            case NEW_STUDENTS -> {
+                CategoryAxis xAxis = new CategoryAxis();
+                xAxis.setLabel("Tháng");
+                NumberAxis yAxis = new NumberAxis();
+                yAxis.setLabel("Số lượng nhập học");
+                yAxis.setTickUnit(1);
+                yAxis.setMinorTickVisible(false);
+                LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
+                lineChart.setTitle("Xu hướng nhập học");
+                lineChart.setLegendVisible(false);
+                
+                XYChart.Series<String, Number> series = new XYChart.Series<>();
+                Map<String, Integer> data = reportService.getNewStudentsTrend(fromDatePicker.getValue(), toDatePicker.getValue());
+                data.forEach((k, v) -> series.getData().add(new XYChart.Data<>(k, v)));
+                
+                lineChart.getData().add(series);
+                chartContainer.getChildren().add(lineChart);
+            }
+            case EXCELLENT_STUDENTS -> {
+                double threshold = parseThreshold();
+                Map<String, Integer> data = reportService.getExcellentRatio(threshold);
+                PieChart pieChart = new PieChart();
+                pieChart.setTitle("Tỷ lệ học sinh xuất sắc (>= " + threshold + ")");
+                
+                data.forEach((k, v) -> pieChart.getData().add(new PieChart.Data(k + " (" + v + ")", v)));
+                chartContainer.getChildren().add(pieChart);
+            }
         }
     }
 
@@ -149,17 +247,90 @@ public class ReportsController {
         reportCombo.valueProperty().addListener((obs, oldValue, newValue) -> toggleDynamicFilters(newValue));
         reportCombo.getSelectionModel().select(ReportType.STUDENT_ROSTER);
 
-        thresholdField.setText("9.0");
-        toggleDynamicFilters(reportCombo.getValue());
+        yearFilter.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(NamHoc object) {
+                return object == null ? "" : object.getTenNamHoc();
+            }
+            @Override
+            public NamHoc fromString(String string) { return null; }
+        });
+        yearFilter.valueProperty().addListener((obs, oldVal, newVal) -> loadSemesters(newVal));
 
+        semesterFilter.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(HocKy object) {
+                return object == null ? "" : "Học kỳ " + object.getThuTuKy();
+            }
+            @Override
+            public HocKy fromString(String string) { return null; }
+        });
+        semesterFilter.valueProperty().addListener((obs, oldVal, newVal) -> loadClassOptions());
+
+        thresholdField.setText("9.0");
         LocalDate now = LocalDate.now();
         fromDatePicker.setValue(now.withDayOfMonth(1));
         toDatePicker.setValue(now);
+        toggleDynamicFilters(reportCombo.getValue());
+    }
+
+    public class IntegerStringConverter extends StringConverter<Number> {
+        @Override
+        public String toString(Number object) {
+            if (object.intValue() != object.doubleValue()) {
+                return "";
+            }
+            return String.valueOf(object.intValue());
+        }
+
+        @Override
+        public Number fromString(String string) {
+            try {
+                return Integer.parseInt(string);
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        }
+    }
+
+    private void loadYears() {
+        try {
+            List<NamHoc> years = catalogService.getAllNamHoc();
+            yearFilter.setItems(FXCollections.observableArrayList(years));
+            if (!years.isEmpty()) {
+                yearFilter.getSelectionModel().selectFirst();
+            }
+        } catch (Exception ex) {
+            setReportStatus("Không thể tải danh sách năm học: " + ex.getMessage(), true);
+        }
+    }
+
+    private void loadSemesters(NamHoc year) {
+        if (year == null) {
+            semesterFilter.setItems(FXCollections.observableArrayList());
+            return;
+        }
+        try {
+            List<HocKy> semesters = catalogService.getHocKyByNamHoc(year.getMaNamHoc());
+            semesterFilter.setItems(FXCollections.observableArrayList(semesters));
+            if (!semesters.isEmpty()) {
+                semesterFilter.getSelectionModel().selectFirst();
+            } else {
+                loadClassOptions();
+            }
+        } catch (Exception ex) {
+            setReportStatus("Không thể tải danh sách học kỳ: " + ex.getMessage(), true);
+        }
     }
 
     private void loadClassOptions() {
+        HocKy semester = semesterFilter.getValue();
+        if (semester == null) {
+            classCombo.setItems(FXCollections.observableArrayList());
+            return;
+        }
         try {
-            List<ReportClassOption> classes = documentService.listClasses();
+            List<ReportClassOption> classes = documentService.listClasses(semester.getMaHocKy());
             classCombo.setItems(FXCollections.observableArrayList(classes));
         } catch (Exception ex) {
             classCombo.setPromptText("Không thể tải lớp học");
@@ -169,7 +340,7 @@ public class ReportsController {
 
     private void refreshOverview() {
         try {
-            ReportSummary summary = reportService.loadOverview(fromDatePicker.getValue(), toDatePicker.getValue());
+            ReportSummary summary = reportService.loadOverview(null, null);
             studentValue.setText(Integer.toString(summary.totalStudents()));
             averageScoreValue.setText(summary.formattedAverageScore());
             teacherValue.setText(Integer.toString(summary.totalTeachers()));
@@ -200,7 +371,11 @@ public class ReportsController {
             return;
         }
         toggleControl(classCombo, type.requiresClassSelection);
+        toggleControl(yearFilter, type.requiresClassSelection);
+        toggleControl(semesterFilter, type.requiresClassSelection);
         toggleControl(thresholdField, type.requiresThreshold);
+        toggleControl(fromDatePicker, type.requiresDateSelection);
+        toggleControl(toDatePicker, type.requiresDateSelection);
         if (!type.requiresClassSelection) {
             classCombo.getSelectionModel().clearSelection();
         }
@@ -243,19 +418,21 @@ public class ReportsController {
     }
 
     private enum ReportType {
-        STUDENT_ROSTER("Danh sách học viên", false, false),
-        CLASS_SCORE("Bảng điểm theo lớp", true, false),
-        NEW_STUDENTS("Học viên mới", false, false),
-        EXCELLENT_STUDENTS("Học viên xuất sắc", false, true);
+        STUDENT_ROSTER("Danh sách học sinh", false, false, false),
+        CLASS_SCORE("Bảng điểm theo lớp", true, false, false),
+        NEW_STUDENTS("Học sinh mới", false, false, true),
+        EXCELLENT_STUDENTS("Học sinh xuất sắc", false, true, false);
 
         private final String displayName;
         private final boolean requiresClassSelection;
         private final boolean requiresThreshold;
+        private final boolean requiresDateSelection;
 
-        ReportType(String displayName, boolean requiresClassSelection, boolean requiresThreshold) {
+        ReportType(String displayName, boolean requiresClassSelection, boolean requiresThreshold, boolean requiresDateSelection) {
             this.displayName = displayName;
             this.requiresClassSelection = requiresClassSelection;
             this.requiresThreshold = requiresThreshold;
+            this.requiresDateSelection = requiresDateSelection;
         }
     }
 }

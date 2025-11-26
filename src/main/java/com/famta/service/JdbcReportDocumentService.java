@@ -40,6 +40,7 @@ public class JdbcReportDocumentService {
         """;
 
     private static final String CLASS_LIST_SQL = "SELECT MaLopHoc, TenLopHoc FROM LOPHOC ORDER BY TenLopHoc";
+    private static final String CLASS_LIST_BY_SEMESTER_SQL = "SELECT MaLopHoc, TenLopHoc FROM LOPHOC WHERE MaHocKy = ? ORDER BY TenLopHoc";
     private static final String STUDENT_SQL = "SELECT MaHocSinh, Ho, TenLot, Ten, NgaySinh, GioiTinh, NgayNhapHoc FROM HOCSINH";
 
     private final DatabaseManager databaseManager = DatabaseManager.getInstance();
@@ -56,6 +57,23 @@ public class JdbcReportDocumentService {
             }
         } catch (SQLException ex) {
             throw new IllegalStateException("Không thể tải danh sách lớp phục vụ báo cáo", ex);
+        }
+        return classes;
+    }
+
+    public List<ReportClassOption> listClasses(String semesterId) {
+        List<ReportClassOption> classes = new ArrayList<>();
+        try (PreparedStatement ps = databaseManager.getConnection().prepareStatement(CLASS_LIST_BY_SEMESTER_SQL)) {
+            ps.setString(1, semesterId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String id = rs.getString("MaLopHoc");
+                    String name = rs.getString("TenLopHoc");
+                    classes.add(new ReportClassOption(id, safeTrim(name)));
+                }
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException("Không thể tải danh sách lớp cho học kỳ " + semesterId, ex);
         }
         return classes;
     }

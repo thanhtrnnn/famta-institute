@@ -12,6 +12,7 @@ import com.famta.service.dto.AdminClassOverview;
 import com.famta.service.dto.GuardianContactView;
 import com.famta.service.dto.StudentClassEnrollment;
 import com.famta.session.UserSession;
+import com.famta.util.AccountUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -98,6 +99,39 @@ public class AccountManagementController {
 
     @FXML
     private Label accountFormStatus;
+
+    @FXML
+    private TextField fullNameField;
+
+    @FXML
+    private void handleGenerateUsername() {
+        String fullName = fullNameField.getText();
+        QuyenTruyCap role = accountRoleComboBox.getValue();
+        if (fullName == null || fullName.isBlank()) {
+            setAccountFormStatus("Vui lòng nhập họ tên", "warning-message");
+            return;
+        }
+        if (role == null) {
+            setAccountFormStatus("Vui lòng chọn quyền", "warning-message");
+            return;
+        }
+        
+        String base = AccountUtils.generateBaseUsername(fullName, role);
+        String candidate = base;
+        int counter = 2;
+        
+        while (isUsernameTaken(candidate)) {
+            candidate = base + counter;
+            counter++;
+        }
+        
+        accountUsernameField.setText(candidate);
+        setAccountFormStatus("Đã tạo: " + candidate, "success-message");
+    }
+    
+    private boolean isUsernameTaken(String username) {
+        return accountRows.stream().anyMatch(r -> r.username().equalsIgnoreCase(username));
+    }
 
     @FXML
     private Button accountDeleteButton;
@@ -356,7 +390,7 @@ public class AccountManagementController {
         SortedList<StudentClassEnrollment> sorted = new SortedList<>(studentFiltered);
         sorted.comparatorProperty().bind(studentTable.comparatorProperty());
         studentTable.setItems(sorted);
-        studentTable.setPlaceholder(createPlaceholder("Không tìm thấy học viên nào"));
+        studentTable.setPlaceholder(createPlaceholder("Không tìm thấy học sinh nào"));
         studentSearchField.textProperty().addListener((obs, oldValue, newValue) -> applyStudentFilter(newValue));
     }
 

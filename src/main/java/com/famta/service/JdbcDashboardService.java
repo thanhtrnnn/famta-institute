@@ -73,7 +73,7 @@ public class JdbcDashboardService {
 
     private List<String> buildAnnouncements(int students, int classes, int scheduleCount) {
         List<String> messages = new ArrayList<>();
-        messages.add("Hiện có " + students + " học viên đang theo học.");
+        messages.add("Hiện có " + students + " học sinh đang theo học.");
         messages.add("" + classes + " lớp được xếp lịch trong học kỳ hiện tại.");
         messages.add(scheduleCount + " phiên học đang diễn ra trong ngày.");
         return messages;
