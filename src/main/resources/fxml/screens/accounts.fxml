@@ -38,7 +38,7 @@
                             <Label text="Tài khoản giảng dạy" styleClass="card-meta" />
                         </VBox>
                         <VBox styleClass="stat-card">
-                            <Label text="Học viên" styleClass="card-title" />
+                            <Label text="Học sinh" styleClass="card-title" />
                             <Label fx:id="studentCountLabel" text="0" styleClass="card-value" />
                             <Label text="Tài khoản đang học" styleClass="card-meta" />
                         </VBox>
@@ -62,116 +62,122 @@
     <center>
         <TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>
-                <Tab fx:id="accountAdminTab" text="Tài khoản đăng nhập">
-                    <content>
-                        <VBox spacing="10.0">
-                            <padding>
-                                <Insets top="10.0" right="10.0" bottom="10.0" left="10.0" />
-                            </padding>
-                            <HBox spacing="8.0" alignment="CENTER_LEFT">
-                                <TextField fx:id="accountSearchField" promptText="Tìm theo tên đăng nhập hoặc quyền" HBox.hgrow="ALWAYS" />
-                                <Button text="Tạo mới" onAction="#handleNewAccount" />
-                                <Button fx:id="accountDeleteButton" text="Xóa" styleClass="danger" onAction="#handleDeleteAccount" />
-                            </HBox>
-                            <SplitPane dividerPositions="0.5">
-                                <items>
-                                    <TableView fx:id="accountTable" prefHeight="420.0">
-                                        <columns>
-                                            <TableColumn fx:id="accountUsernameColumn" text="Tên đăng nhập" prefWidth="200.0" />
-                                            <TableColumn fx:id="accountRoleColumn" text="Quyền" prefWidth="180.0" />
-                                        </columns>
-                                    </TableView>
-                                    <VBox spacing="10.0" styleClass="card">
-                                        <Label fx:id="accountFormTitle" text="Tạo tài khoản mới" styleClass="section-title" />
-                                        <Label fx:id="accountFormStatus" text="" styleClass="info-text" />
-                                        <TextField fx:id="accountUsernameField" promptText="Tên đăng nhập" />
-                                        <ComboBox fx:id="accountRoleComboBox" promptText="Quyền truy cập" />
-                                        <PasswordField fx:id="accountPasswordField" promptText="Mật khẩu (ít nhất 6 ký tự)" />
-                                        <PasswordField fx:id="accountConfirmPasswordField" promptText="Xác nhận mật khẩu" />
-                                        <Button text="Lưu" onAction="#handleSaveAccount" />
-                                    </VBox>
-                                </items>
-                            </SplitPane>
-                        </VBox>
-                    </content>
+                <Tab text="Tài khoản hệ thống">
+                    <VBox spacing="10.0">
+                        <padding>
+                            <Insets top="10.0" right="10.0" bottom="10.0" left="10.0" />
+                        </padding>
+                        <HBox spacing="8.0" alignment="CENTER_LEFT">
+                            <TextField fx:id="accountSearchField" promptText="Tìm theo tên đăng nhập hoặc quyền" HBox.hgrow="ALWAYS" />
+                            <Button text="Tạo mới" onAction="#handleNewAccount" />
+                            <Button fx:id="accountDeleteButton" text="Xóa" styleClass="danger" onAction="#handleDeleteAccount" />
+                        </HBox>
+                        <SplitPane dividerPositions="0.5" VBox.vgrow="ALWAYS">
+                            <items>
+                                <TableView fx:id="accountTable" prefHeight="420.0">
+                                    <columnResizePolicy>
+                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                    </columnResizePolicy>
+                                    <columns>
+                                        <TableColumn fx:id="accountUsernameColumn" text="Tên đăng nhập" prefWidth="200.0" />
+                                        <TableColumn fx:id="accountRoleColumn" text="Quyền" prefWidth="180.0" />
+                                    </columns>
+                                </TableView>
+                                <VBox spacing="10.0" styleClass="card">
+                                    <Label fx:id="accountFormTitle" text="Tạo tài khoản mới" styleClass="section-title" />
+                                    <Label fx:id="accountFormStatus" text="" styleClass="info-text" />
+                                    <HBox spacing="5">
+                                        <TextField fx:id="fullNameField" promptText="Họ và tên (để tạo user)" HBox.hgrow="ALWAYS"/>
+                                        <Button text="Tạo User" onAction="#handleGenerateUsername"/>
+                                    </HBox>
+                                    <TextField fx:id="accountUsernameField" promptText="Tên đăng nhập" />
+                                    <ComboBox fx:id="accountRoleComboBox" promptText="Quyền truy cập" />
+                                    <PasswordField fx:id="accountPasswordField" promptText="Mật khẩu (ít nhất 6 ký tự)" />
+                                    <PasswordField fx:id="accountConfirmPasswordField" promptText="Xác nhận mật khẩu" />
+                                    <Button text="Lưu" onAction="#handleSaveAccount" />
+                                </VBox>
+                            </items>
+                        </SplitPane>
+                    </VBox>
                 </Tab>
-                <Tab text="Admin">
-                    <content>
-                        <VBox spacing="10.0">
-                            <padding>
-                                <Insets top="10.0" right="10.0" bottom="10.0" left="10.0" />
-                            </padding>
-                            <TextField fx:id="adminSearchField" promptText="Tìm theo tên lớp, môn hoặc giáo viên" />
-                            <TableView fx:id="adminTable" VBox.vgrow="ALWAYS">
-                                <columns>
-                                    <TableColumn fx:id="adminClassIdColumn" text="Mã lớp" prefWidth="110.0" />
-                                    <TableColumn fx:id="adminClassNameColumn" text="Tên lớp" prefWidth="200.0" />
-                                    <TableColumn fx:id="adminSubjectColumn" text="Môn học" prefWidth="180.0" />
-                                    <TableColumn fx:id="adminTeacherColumn" text="Giáo viên phụ trách" prefWidth="220.0" />
-                                    <TableColumn fx:id="adminRoomColumn" text="Phòng học" prefWidth="140.0" />
-                                </columns>
-                            </TableView>
-                        </VBox>
-                    </content>
+                <Tab fx:id="accountAdminTab" text="Lớp học (Admin)">
+                    <VBox spacing="10.0">
+                        <padding>
+                            <Insets top="10.0" right="10.0" bottom="10.0" left="10.0" />
+                        </padding>
+                        <TextField fx:id="adminSearchField" promptText="Tìm kiếm lớp học..." />
+                        <TableView fx:id="adminTable" VBox.vgrow="ALWAYS">
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                            </columnResizePolicy>
+                            <columns>
+                                <TableColumn fx:id="adminClassIdColumn" text="Mã lớp" />
+                                <TableColumn fx:id="adminClassNameColumn" text="Tên lớp" />
+                                <TableColumn fx:id="adminSubjectColumn" text="Môn học" />
+                                <TableColumn fx:id="adminTeacherColumn" text="Giáo viên" />
+                                <TableColumn fx:id="adminRoomColumn" text="Phòng" />
+                            </columns>
+                        </TableView>
+                    </VBox>
                 </Tab>
                 <Tab text="Giáo viên">
-                    <content>
-                        <VBox spacing="10.0">
-                            <padding>
-                                <Insets top="10.0" right="10.0" bottom="10.0" left="10.0" />
-                            </padding>
-                            <TextField fx:id="teacherSearchField" promptText="Tìm theo mã, tên hoặc email" />
-                            <TableView fx:id="teacherTable" VBox.vgrow="ALWAYS">
-                                <columns>
-                                    <TableColumn fx:id="teacherIdColumn" text="Mã GV" prefWidth="120.0" />
-                                    <TableColumn fx:id="teacherNameColumn" text="Họ tên" prefWidth="220.0" />
-                                    <TableColumn fx:id="teacherEmailColumn" text="Email" prefWidth="220.0" />
-                                    <TableColumn fx:id="teacherPhoneColumn" text="Điện thoại" prefWidth="150.0" />
-                                </columns>
-                            </TableView>
-                        </VBox>
-                    </content>
+                    <VBox spacing="10.0">
+                        <padding>
+                            <Insets top="10.0" right="10.0" bottom="10.0" left="10.0" />
+                        </padding>
+                        <TextField fx:id="teacherSearchField" promptText="Tìm kiếm giáo viên..." />
+                        <TableView fx:id="teacherTable" VBox.vgrow="ALWAYS">
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                            </columnResizePolicy>
+                            <columns>
+                                <TableColumn fx:id="teacherIdColumn" text="Mã GV" />
+                                <TableColumn fx:id="teacherNameColumn" text="Họ tên" />
+                                <TableColumn fx:id="teacherEmailColumn" text="Email" />
+                                <TableColumn fx:id="teacherPhoneColumn" text="SĐT" />
+                            </columns>
+                        </TableView>
+                    </VBox>
                 </Tab>
-                <Tab text="Học viên">
-                    <content>
-                        <VBox spacing="10.0">
-                            <padding>
-                                <Insets top="10.0" right="10.0" bottom="10.0" left="10.0" />
-                            </padding>
-                            <TextField fx:id="studentSearchField" promptText="Tìm theo mã học viên hoặc lớp" />
-                            <TableView fx:id="studentTable" VBox.vgrow="ALWAYS">
-                                <columns>
-                                    <TableColumn fx:id="studentIdColumn" text="Mã HV" prefWidth="120.0" />
-                                    <TableColumn fx:id="studentNameColumn" text="Họ tên" prefWidth="220.0" />
-                                    <TableColumn fx:id="studentClassIdColumn" text="Mã lớp" prefWidth="120.0" />
-                                    <TableColumn fx:id="studentClassNameColumn" text="Tên lớp" prefWidth="220.0" />
-                                </columns>
-                            </TableView>
-                        </VBox>
-                    </content>
+                <Tab text="Học sinh">
+                    <VBox spacing="10.0">
+                        <padding>
+                            <Insets top="10.0" right="10.0" bottom="10.0" left="10.0" />
+                        </padding>
+                        <TextField fx:id="studentSearchField" promptText="Tìm kiếm học sinh..." />
+                        <TableView fx:id="studentTable" VBox.vgrow="ALWAYS">
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                            </columnResizePolicy>
+                            <columns>
+                                <TableColumn fx:id="studentIdColumn" text="Mã HS" />
+                                <TableColumn fx:id="studentNameColumn" text="Họ tên" />
+                                <TableColumn fx:id="studentClassIdColumn" text="Mã lớp" />
+                                <TableColumn fx:id="studentClassNameColumn" text="Tên lớp" />
+                            </columns>
+                        </TableView>
+                    </VBox>
                 </Tab>
                 <Tab text="Phụ huynh">
-                    <content>
-                        <VBox spacing="10.0">
-                            <padding>
-                                <Insets top="10.0" right="10.0" bottom="10.0" left="10.0" />
-                            </padding>
-                            <HBox spacing="8.0">
-                                <TextField fx:id="guardianSearchField" promptText="Tìm theo học viên, phụ huynh, quan hệ hoặc email" HBox.hgrow="ALWAYS" />
-                                <Button text="Sao chép email" onAction="#handleCopyGuardianEmails" />
-                            </HBox>
-                            <TableView fx:id="guardianTable" VBox.vgrow="ALWAYS">
-                                <columns>
-                                    <TableColumn fx:id="guardianStudentIdColumn" text="Mã HV" prefWidth="110.0" />
-                                    <TableColumn fx:id="guardianStudentNameColumn" text="Học viên" prefWidth="200.0" />
-                                    <TableColumn fx:id="guardianNameColumn" text="Người giám hộ" prefWidth="200.0" />
-                                    <TableColumn fx:id="guardianRelationColumn" text="Quan hệ" prefWidth="130.0" />
-                                    <TableColumn fx:id="guardianEmailColumn" text="Email" prefWidth="220.0" />
-                                    <TableColumn fx:id="guardianPhoneColumn" text="Điện thoại" prefWidth="150.0" />
-                                </columns>
-                            </TableView>
-                        </VBox>
-                    </content>
+                    <VBox spacing="10.0">
+                        <padding>
+                            <Insets top="10.0" right="10.0" bottom="10.0" left="10.0" />
+                        </padding>
+                        <TextField fx:id="guardianSearchField" promptText="Tìm kiếm phụ huynh..." />
+                        <TableView fx:id="guardianTable" VBox.vgrow="ALWAYS">
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                            </columnResizePolicy>
+                            <columns>
+                                <TableColumn fx:id="guardianStudentIdColumn" text="Mã HS" />
+                                <TableColumn fx:id="guardianStudentNameColumn" text="Tên HS" />
+                                <TableColumn fx:id="guardianNameColumn" text="Phụ huynh" />
+                                <TableColumn fx:id="guardianRelationColumn" text="Quan hệ" />
+                                <TableColumn fx:id="guardianEmailColumn" text="Email" />
+                                <TableColumn fx:id="guardianPhoneColumn" text="SĐT" />
+                            </columns>
+                        </TableView>
+                    </VBox>
                 </Tab>
             </tabs>
         </TabPane>
