@@ -14,14 +14,14 @@
       <HBox spacing="12.0" styleClass="stat-grid">
          <children>
             <VBox styleClass="stat-card" spacing="4.0">
-               <Label text="Tổng số học viên" styleClass="card-title" />
+               <Label text="Tổng số học sinh" styleClass="card-title" />
                <Label fx:id="totalStudentsValue" text="--" styleClass="card-value" />
                <Label fx:id="studentsMetaLabel" text="Đang tải dữ liệu" styleClass="card-meta" />
             </VBox>
             <VBox styleClass="stat-card" spacing="4.0">
                <Label text="Giáo viên hoạt động" styleClass="card-title" />
                <Label fx:id="activeTeachersValue" text="--" styleClass="card-value" />
-               <Label fx:id="teachersMetaLabel" text="Bao gồm giáo viên thỉnh giảng" styleClass="card-meta" />
+               <Label fx:id="teachersMetaLabel" text="Bao gồm Giáo viên thỉnh giảng" styleClass="card-meta" />
             </VBox>
             <VBox styleClass="stat-card" spacing="4.0">
                <Label text="Lớp đang diễn ra" styleClass="card-title" />
@@ -34,7 +34,7 @@
          <children>
             <VBox spacing="10.0" VBox.vgrow="ALWAYS">
                <Label text="Thông báo gần đây" styleClass="section-title" />
-               <ListView fx:id="announcementsList" prefHeight="220.0" prefWidth="300.0">
+               <ListView fx:id="announcementsList" prefHeight="220.0" prefWidth="350.0">
                   <placeholder>
                      <Label text="Chưa có thông báo nào" />
                   </placeholder>
@@ -42,9 +42,9 @@
             </VBox>
             <VBox spacing="10.0" VBox.vgrow="ALWAYS">
                <Label text="Lịch giảng dạy trong ngày" styleClass="section-title" />
-               <ListView fx:id="scheduleList" prefHeight="220.0" prefWidth="300.0">
+               <ListView fx:id="scheduleList" prefHeight="220.0" prefWidth="350.0">
                   <placeholder>
-                     <Label text="Không có lớp học" />
+                     <Label text="Không có Lớp học" />
                   </placeholder>
                </ListView>
             </VBox>
