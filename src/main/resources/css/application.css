@@ -70,8 +70,13 @@
 
 .nav-button:selected {
     -fx-background-color: #3498db;
-    -fx-text-fill: #000000;
+    -fx-text-fill: #ffffff;
     -fx-font-weight: bold;
+}
+
+.nav-button:selected:hover {
+    -fx-background-color: #2980b9;
+    -fx-text-fill: #ffffff;
 }
 
 .nav-button:hover {
@@ -248,6 +253,11 @@
     -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-text-fill: #34495e;
+}
+
+.label.subheader:hover {
+    -fx-text-fill: #2980b9;
+    -fx-underline: true;
 }
 
 /* Status Bar */
