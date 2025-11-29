@@ -16,13 +16,15 @@
       <Label text="Báo cáo &amp; Thống kê" styleClass="view-title" />
       <HBox alignment="CENTER_LEFT" spacing="10.0">
          <children>
-            <ComboBox fx:id="reportCombo" prefWidth="220.0" promptText="Chọn báo cáo" />
-            <ComboBox fx:id="classCombo" prefWidth="200.0" promptText="Chọn lớp" />
-            <TextField fx:id="thresholdField" promptText="Điểm chuẩn" prefWidth="120.0" />
-            <DatePicker fx:id="fromDatePicker" promptText="Từ ngày" />
-            <DatePicker fx:id="toDatePicker" promptText="Đến ngày" />
+            <ComboBox fx:id="reportCombo" prefWidth="200.0" promptText="Chọn báo cáo" />
+            <ComboBox fx:id="yearFilter" prefWidth="150.0" promptText="Năm học" />
+            <ComboBox fx:id="semesterFilter" prefWidth="150.0" promptText="Học kỳ" />
+            <ComboBox fx:id="classCombo" prefWidth="220.0" promptText="Chọn lớp" />
+            <TextField fx:id="thresholdField" promptText="Điểm chuẩn" prefWidth="100.0" />
+            <DatePicker fx:id="fromDatePicker" promptText="Từ ngày" prefWidth="150.0" />
+            <DatePicker fx:id="toDatePicker" promptText="Đến ngày" prefWidth="150.0" />
             <Pane HBox.hgrow="ALWAYS" />
-            <Button fx:id="filterButton" mnemonicParsing="false" text="Cập nhật chỉ số" onAction="#handleRefresh" />
+            <Button fx:id="filterButton" mnemonicParsing="false" text="Làm mới" onAction="#handleRefresh" />
             <Button fx:id="generateButton" mnemonicParsing="false" text="Tạo báo cáo" onAction="#handleGenerate" />
             <Button fx:id="copyButton" mnemonicParsing="false" text="Sao chép" onAction="#handleCopy" disable="true" />
          </children>
@@ -34,7 +36,7 @@
                <children>
                   <VBox styleClass="stat-card" spacing="4.0">
                      <children>
-                         <Label text="Tổng học viên" styleClass="card-title" />
+                         <Label text="Tổng Học sinh" styleClass="card-title" />
                         <Label fx:id="studentValue" text="--" styleClass="card-value" />
                      </children>
                   </VBox>
@@ -52,10 +54,14 @@
                   </VBox>
                </children>
             </HBox>
-            <VBox spacing="10.0" styleClass="chart-placeholder">
+            <VBox spacing="10.0" VBox.vgrow="ALWAYS">
                <children>
-                  <Label text="Biểu đồ" styleClass="section-title" />
-                  <Label fx:id="chartDescription" wrapText="true" text="Khu vực hiển thị biểu đồ đường/cột cho báo cáo được chọn." />
+                  <Label text="Biểu đồ trực quan" styleClass="section-title" />
+                  <javafx.scene.layout.StackPane fx:id="chartContainer" prefHeight="300.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+                      <children>
+                          <Label fx:id="chartDescription" text="Chọn loại báo cáo và nhấn 'Tạo báo cáo' để xem biểu đồ" style="-fx-text-fill: #7f8c8d;" />
+                      </children>
+                  </javafx.scene.layout.StackPane>
                </children>
             </VBox>
             <VBox spacing="8.0" VBox.vgrow="ALWAYS">

@@ -5,57 +5,84 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.famta.controller.MainController">
-  <fx:define>
-    <ToggleGroup fx:id="navigationGroup" />
-  </fx:define>
-  <left>
-    <VBox spacing="16.0" styleClass="nav-panel" BorderPane.alignment="CENTER">
-      <padding>
-        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
-      </padding>
-      <children>
-        <Label text="FAMTA Institute" styleClass="app-title" />
-        <Label text="Bảng điều khiển" styleClass="app-subtitle" />
-        <ToggleButton fx:id="dashboardToggle" text="Tổng quan" toggleGroup="$navigationGroup" userData="dashboard" styleClass="nav-button" />
-        <ToggleButton fx:id="studentsToggle" text="Học viên" toggleGroup="$navigationGroup" userData="students" styleClass="nav-button" />
-        <ToggleButton fx:id="guardiansToggle" text="Phụ huynh" toggleGroup="$navigationGroup" userData="guardians" styleClass="nav-button" />
-        <ToggleButton fx:id="teachersToggle" text="Giáo viên" toggleGroup="$navigationGroup" userData="teachers" styleClass="nav-button" />
-        <ToggleButton fx:id="classesToggle" text="Lớp học" toggleGroup="$navigationGroup" userData="classes" styleClass="nav-button" />
-        <ToggleButton fx:id="coursesToggle" text="Khóa học" toggleGroup="$navigationGroup" userData="courses" styleClass="nav-button" />
-        <ToggleButton fx:id="scoresToggle" text="Điểm số" toggleGroup="$navigationGroup" userData="scores" styleClass="nav-button" />
-        <ToggleButton fx:id="reportsToggle" text="Báo cáo" toggleGroup="$navigationGroup" userData="reports" styleClass="nav-button" />
-        <ToggleButton fx:id="masterDataToggle" text="Danh mục" toggleGroup="$navigationGroup" userData="master-data" styleClass="nav-button" />
-        <Button fx:id="accountButton" mnemonicParsing="false" text="Tài khoản" onAction="#handleAccountManagement" maxWidth="Infinity" />
-        <Button mnemonicParsing="false" text="Đăng xuất" onAction="#handleSignOut" maxWidth="Infinity" />
-      </children>
-    </VBox>
-  </left>
-  <center>
-    <StackPane fx:id="contentHost" BorderPane.alignment="CENTER">
-      <children>
-        <Label text="Đang tải nội dung..." />
-      </children>
-      <padding>
-        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
-      </padding>
-    </StackPane>
-  </center>
-  <bottom>
-    <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="status-bar" BorderPane.alignment="CENTER">
-      <padding>
-        <Insets bottom="6.0" left="14.0" right="14.0" top="6.0" />
-      </padding>
-      <children>
-        <Label fx:id="roleLabel" text="--" />
-        <Label text="•" />
-        <Label fx:id="statusLabel" text="Đang khởi động" />
-      </children>
-    </HBox>
-  </bottom>
-</BorderPane>
+<StackPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.famta.controller.MainController">
+    <BorderPane>
+      <fx:define>
+        <ToggleGroup fx:id="navigationGroup" />
+      </fx:define>
+      <left>
+        <StackPane BorderPane.alignment="CENTER">
+            <VBox spacing="16.0" styleClass="nav-panel">
+              <padding>
+                <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+              </padding>
+              <children>
+                <StackPane>
+                    <Button onAction="#handleSwitchTheme" style="-fx-background-color: transparent; -fx-cursor: hand;">
+                        <graphic>
+                            <ImageView fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
+                                <image>
+                                    <Image url="@../images/nguyet-que.png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </StackPane>
+                <ToggleButton fx:id="dashboardToggle" text="Tổng quan" toggleGroup="$navigationGroup" userData="dashboard" styleClass="nav-button" />
+                <ToggleButton fx:id="timetableToggle" text="Thời khóa biểu" toggleGroup="$navigationGroup" userData="timetable" styleClass="nav-button" />
+                <ToggleButton fx:id="studentsToggle" text="Học sinh" toggleGroup="$navigationGroup" userData="students" styleClass="nav-button" />
+                <ToggleButton fx:id="guardiansToggle" text="Phụ huynh" toggleGroup="$navigationGroup" userData="guardians" styleClass="nav-button" />
+                <ToggleButton fx:id="teachersToggle" text="Giáo viên" toggleGroup="$navigationGroup" userData="teachers" styleClass="nav-button" />
+                <ToggleButton fx:id="coursesToggle" text="Khoá học" toggleGroup="$navigationGroup" userData="courses" styleClass="nav-button" />
+                <ToggleButton fx:id="scoresToggle" text="Điểm số" toggleGroup="$navigationGroup" userData="scores" styleClass="nav-button" />
+                <ToggleButton fx:id="reportsToggle" text="Báo cáo" toggleGroup="$navigationGroup" userData="reports" styleClass="nav-button" />
+                <ToggleButton fx:id="masterDataToggle" text="Danh mục" toggleGroup="$navigationGroup" userData="master-data" styleClass="nav-button" />
+                <Button fx:id="accountButton" mnemonicParsing="false" text="Tài khoản" onAction="#handleAccountManagement" maxWidth="Infinity" />
+                <Button mnemonicParsing="false" text="Đăng xuất" onAction="#handleSignOut" maxWidth="Infinity" />
+              </children>
+            </VBox>
+            <Pane fx:id="sidebarSnowPane" mouseTransparent="true" />
+        </StackPane>
+      </left>
+      <center>
+        <StackPane fx:id="contentHost" BorderPane.alignment="CENTER">
+          <children>
+            <Label text="Đang tải nội dung..." />
+          </children>
+          <padding>
+            <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+          </padding>
+        </StackPane>
+      </center>
+      <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="status-bar" BorderPane.alignment="CENTER">
+          <padding>
+            <Insets bottom="6.0" left="14.0" right="14.0" top="6.0" />
+          </padding>
+          <children>
+            <Label fx:id="roleLabel" text="--" />
+            <Label text="•" />
+            <Label fx:id="statusLabel" text="Đang khởi động" />
+          </children>
+        </HBox>
+      </bottom>
+    </BorderPane>
+    
+    <AnchorPane fx:id="decorationPane" pickOnBounds="false" mouseTransparent="true" visible="false">
+        <ImageView fx:id="santaImage" fitWidth="450.0" preserveRatio="true" AnchorPane.bottomAnchor="50.0" AnchorPane.rightAnchor="50.0">
+             <image>
+                 <Image url="@../images/santa-sleigh.png" />
+             </image>
+        </ImageView>
+    </AnchorPane>
+</StackPane>

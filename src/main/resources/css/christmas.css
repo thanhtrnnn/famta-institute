@@ -1,0 +1,58 @@
+/* Christmas Theme Overrides */
+.root {
+    -fx-background-color: #f0f8ff; /* AliceBlue - Snow tint */
+}
+
+.nav-panel {
+    /* Red to Green gradient */
+    -fx-background-color: linear-gradient(to top, #d03e2e, #22a458);
+}
+
+.nav-button {
+    -fx-text-fill: #ffffff;
+}
+
+.nav-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-button:selected {
+    -fx-background-color: #e74c3c; /* Bright Red */
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #ffffff;
+    -fx-border-width: 0 0 0 4;
+}
+
+.nav-button:selected:hover {
+    -fx-background-color: #c0392b; /* Darker Red on hover */
+}
+
+.app-title {
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(one-pass-box, #000000, 2, 1, 0, 0);
+}
+
+.header-label {
+    -fx-text-fill: #c0392b; /* Red text for headers */
+}
+
+.table-row-cell:even {
+    -fx-background-color: #fff7f7; /* slight red tint */
+}
+
+/* Button Styling */
+.button {
+    -fx-background-color: #27ae60;
+}
+
+.button:hover {
+    -fx-background-color: #229954;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.button:pressed {
+    -fx-background-color: #17984d;
+}
+
+
