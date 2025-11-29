@@ -24,7 +24,7 @@ public class JdbcTimetableService {
         LEFT JOIN TIETHOC tk ON tk.MaTietHoc = lh.TietKetThuc
         LEFT JOIN PHONGHOC ph ON ph.MaPhongHoc = lh.MaPhongHoc
         LEFT JOIN MONHOC mh ON mh.MaMonHoc = l.MaMonHoc
-        WHERE hs.TenDangNhap = ?
+        WHERE hs.MaHocSinh = ?
         ORDER BY lh.Thu, tb.ThoiGianBatDau
     """;
 
@@ -43,7 +43,7 @@ public class JdbcTimetableService {
         LEFT JOIN TIETHOC tk ON tk.MaTietHoc = lh.TietKetThuc
         LEFT JOIN PHONGHOC ph ON ph.MaPhongHoc = lh.MaPhongHoc
         LEFT JOIN MONHOC mh ON mh.MaMonHoc = l.MaMonHoc
-        WHERE gv.TenDangNhap = ?
+        WHERE gv.MaGiaoVien = ?
         ORDER BY lh.Thu, tb.ThoiGianBatDau
     """;
 
@@ -66,20 +66,94 @@ public class JdbcTimetableService {
         LEFT JOIN TIETHOC tk ON tk.MaTietHoc = lh.TietKetThuc
         LEFT JOIN PHONGHOC ph ON ph.MaPhongHoc = lh.MaPhongHoc
         LEFT JOIN MONHOC mh ON mh.MaMonHoc = l.MaMonHoc
-        WHERE ngh.TenDangNhap = ?
+        WHERE ngh.MaNguoiGiamHo = ?
         ORDER BY lh.Thu, tb.ThoiGianBatDau
     """;
 
-    public List<TimetableEntry> fetchStudentTimetable(String studentId) {
-        return fetchTimetable(STUDENT_TIMETABLE_SQL, studentId);
+    public List<TimetableEntry> fetchStudentTimetable(String username) {
+        return fetchTimetable(STUDENT_TIMETABLE_SQL, resolveStudentId(username));
     }
 
-    public List<TimetableEntry> fetchTeacherTimetable(String teacherId) {
-        return fetchTimetable(TEACHER_TIMETABLE_SQL, teacherId);
+    public List<TimetableEntry> fetchTeacherTimetable(String username) {
+        return fetchTimetable(TEACHER_TIMETABLE_SQL, resolveTeacherId(username));
     }
 
-    public List<TimetableEntry> fetchGuardianTimetable(String guardianId) {
-        return fetchTimetable(GUARDIAN_TIMETABLE_SQL, guardianId);
+    public List<TimetableEntry> fetchGuardianTimetable(String username) {
+        return fetchTimetable(GUARDIAN_TIMETABLE_SQL, resolveGuardianId(username));
+    }
+
+    private String resolveStudentId(String username) {
+        if ("student".equals(username)) return "HS00000001";
+        return resolveIdByName(username, "HOCSINH", "MaHocSinh", "hs.");
+    }
+
+    private String resolveTeacherId(String username) {
+        if ("teacher".equals(username)) return "GV00000001";
+        return resolveIdByName(username, "GIAOVIEN", "MaGiaoVien", "gv.");
+    }
+
+    private String resolveGuardianId(String username) {
+        if ("guardian".equals(username)) return "GH00000001";
+        return resolveIdByName(username, "NGUOIGIAMHO", "MaNguoiGiamHo", "gh.");
+    }
+
+    private String resolveIdByName(String username, String tableName, String idColumn, String prefix) {
+        if (!username.startsWith(prefix)) return username;
+        
+        String sql = "SELECT " + idColumn + ", Ho, TenLot, Ten FROM " + tableName;
+        Connection connection = DatabaseManager.getInstance().getConnection();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                String id = rs.getString(idColumn);
+                String ho = rs.getString("Ho");
+                String tenLot = rs.getString("TenLot");
+                String ten = rs.getString("Ten");
+                
+                if (matchesUsername(username, prefix, ho, tenLot, ten)) {
+                    return id;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return username;
+    }
+
+    private boolean matchesUsername(String username, String prefix, String ho, String tenLot, String ten) {
+        String normalizedTen = unaccent(ten).toLowerCase();
+        String normalizedHo = unaccent(ho).toLowerCase();
+        String normalizedTenLot = unaccent(tenLot).toLowerCase();
+        
+        String initialsHo = getInitials(normalizedHo);
+        String initialsTenLot = getInitials(normalizedTenLot);
+        
+        // Pattern 1: prefix + ten + initials(ho) + initials(tenLot) (e.g. hs.tungnv)
+        String candidate1 = prefix + normalizedTen + initialsHo + initialsTenLot;
+        
+        // Pattern 2: prefix + ten + initials(tenLot) + initials(ho) (e.g. hs.anvn)
+        String candidate2 = prefix + normalizedTen + initialsTenLot + initialsHo;
+        
+        return username.equals(candidate1) || username.equals(candidate2);
+    }
+    
+    private String getInitials(String text) {
+        if (text == null || text.isEmpty()) return "";
+        StringBuilder sb = new StringBuilder();
+        for (String word : text.split("\\s+")) {
+            if (!word.isEmpty()) {
+                sb.append(word.charAt(0));
+            }
+        }
+        return sb.toString();
+    }
+
+    private String unaccent(String s) {
+        if (s == null) return "";
+        String temp = java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD);
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(temp).replaceAll("").replace('đ', 'd').replace('Đ', 'D');
     }
 
     private List<TimetableEntry> fetchTimetable(String sql, String id) {

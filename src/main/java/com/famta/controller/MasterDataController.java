@@ -17,51 +17,88 @@ import java.util.Optional;
 public class MasterDataController {
 
     // --- NAM HOC ---
-    @FXML private TableView<NamHoc> tableNamHoc;
-    @FXML private TableColumn<NamHoc, String> colMaNamHoc;
-    @FXML private TableColumn<NamHoc, String> colTenNamHoc;
-    @FXML private TableColumn<NamHoc, LocalDate> colNgayBatDau;
-    @FXML private TableColumn<NamHoc, LocalDate> colNgayKetThuc;
-    @FXML private TextField maNamHocField;
-    @FXML private TextField tenNamHocField;
-    @FXML private DatePicker ngayBatDauPicker;
-    @FXML private DatePicker ngayKetThucPicker;
+    @FXML
+    private TableView<NamHoc> tableNamHoc;
+    @FXML
+    private TableColumn<NamHoc, String> colMaNamHoc;
+    @FXML
+    private TableColumn<NamHoc, String> colTenNamHoc;
+    @FXML
+    private TableColumn<NamHoc, LocalDate> colNgayBatDau;
+    @FXML
+    private TableColumn<NamHoc, LocalDate> colNgayKetThuc;
+    @FXML
+    private TextField maNamHocField;
+    @FXML
+    private TextField tenNamHocField;
+    @FXML
+    private DatePicker ngayBatDauPicker;
+    @FXML
+    private DatePicker ngayKetThucPicker;
 
     // --- HOC KY ---
-    @FXML private TableView<HocKy> tableHocKy;
-    @FXML private TableColumn<HocKy, String> colMaHocKy;
-    @FXML private TableColumn<HocKy, Integer> colThuTuKy;
-    @FXML private TableColumn<HocKy, LocalDate> colNgayBatDauHK;
-    @FXML private TableColumn<HocKy, LocalDate> colNgayKetThucHK;
-    @FXML private TextField maHocKyField;
-    @FXML private TextField thuTuKyField;
-    @FXML private DatePicker ngayBatDauHKPicker;
-    @FXML private DatePicker ngayKetThucHKPicker;
+    @FXML
+    private TableView<HocKy> tableHocKy;
+    @FXML
+    private TableColumn<HocKy, String> colMaHocKy;
+    @FXML
+    private TableColumn<HocKy, Integer> colThuTuKy;
+    @FXML
+    private TableColumn<HocKy, LocalDate> colNgayBatDauHK;
+    @FXML
+    private TableColumn<HocKy, LocalDate> colNgayKetThucHK;
+    @FXML
+    private TextField maHocKyField;
+    @FXML
+    private TextField thuTuKyField;
+    @FXML
+    private DatePicker ngayBatDauHKPicker;
+    @FXML
+    private DatePicker ngayKetThucHKPicker;
 
     // --- KHOA ---
-    @FXML private TableView<Khoa> tableKhoa;
-    @FXML private TableColumn<Khoa, String> colMaKhoa;
-    @FXML private TableColumn<Khoa, String> colTenKhoa;
-    @FXML private TextField maKhoaField;
-    @FXML private TextField tenKhoaField;
+    @FXML
+    private TableView<Khoa> tableKhoa;
+    @FXML
+    private TableColumn<Khoa, String> colMaKhoa;
+    @FXML
+    private TableColumn<Khoa, String> colTenKhoa;
+    @FXML
+    private TextField maKhoaField;
+    @FXML
+    private TextField tenKhoaField;
 
     // --- MON HOC ---
-    @FXML private TableView<MonHoc> tableMonHoc;
-    @FXML private TableColumn<MonHoc, String> colMaMonHoc;
-    @FXML private TableColumn<MonHoc, String> colTenMonHoc;
-    @FXML private TableColumn<MonHoc, String> colKhoaMonHoc;
-    @FXML private TextField maMonHocField;
-    @FXML private TextField tenMonHocField;
-    @FXML private ComboBox<Khoa> khoaBox;
+    @FXML
+    private TableView<MonHoc> tableMonHoc;
+    @FXML
+    private TableColumn<MonHoc, String> colMaMonHoc;
+    @FXML
+    private TableColumn<MonHoc, String> colTenMonHoc;
+    @FXML
+    private TableColumn<MonHoc, String> colKhoaMonHoc;
+    @FXML
+    private TextField maMonHocField;
+    @FXML
+    private TextField tenMonHocField;
+    @FXML
+    private ComboBox<Khoa> khoaBox;
 
     // --- PHONG HOC ---
-    @FXML private TableView<PhongHoc> tablePhongHoc;
-    @FXML private TableColumn<PhongHoc, String> colMaPhongHoc;
-    @FXML private TableColumn<PhongHoc, String> colTenPhongHoc;
-    @FXML private TableColumn<PhongHoc, String> colLoaiPhongHoc;
-    @FXML private TextField maPhongHocField;
-    @FXML private TextField tenPhongHocField;
-    @FXML private ComboBox<LoaiPhongHoc> loaiPhongBox;
+    @FXML
+    private TableView<PhongHoc> tablePhongHoc;
+    @FXML
+    private TableColumn<PhongHoc, String> colMaPhongHoc;
+    @FXML
+    private TableColumn<PhongHoc, String> colTenPhongHoc;
+    @FXML
+    private TableColumn<PhongHoc, String> colLoaiPhongHoc;
+    @FXML
+    private TextField maPhongHocField;
+    @FXML
+    private TextField tenPhongHocField;
+    @FXML
+    private ComboBox<LoaiPhongHoc> loaiPhongBox;
 
     private final JdbcCatalogService catalogService = new JdbcCatalogService();
 
@@ -454,8 +491,7 @@ public class MasterDataController {
             PhongHoc ph = new PhongHoc(
                 maPhongHocField.getText(),
                 tenPhongHocField.getText(),
-                lph != null ? lph.getMaLoaiPhongHoc() : null,
-                lph != null ? lph.getTenLoaiPhongHoc() : null
+                lph != null ? lph.getMaLoaiPhongHoc() : null
             );
             if (maPhongHocField.isDisabled()) {
                 catalogService.updatePhongHoc(ph);

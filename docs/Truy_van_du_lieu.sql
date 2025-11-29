@@ -37,8 +37,6 @@ JOIN PHONGHOC PH ON LH.MaPhongHoc = PH.MaPhongHoc;
 
 -- Tính điểm trung bình của học sinh trong từng năm học và khối
 SELECT MaHocSinh, MaNamHoc, MaKhoi,
-       AVG(DiemSo) AS DiemTrungBinh
+       AVG(DiemThuongXuyen + DiemGiuaKy * 2 + DiemCuoiKy * 3) AS DiemTrungBinh
 FROM HOCSINH_NAMHOC_KHOI_LOPHOC
 GROUP BY MaHocSinh, MaNamHoc, MaKhoi;
-
-

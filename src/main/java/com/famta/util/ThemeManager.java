@@ -10,7 +10,7 @@ import javafx.util.Duration;
 
 public class ThemeManager {
     private static final String CHRISTMAS_CSS = "/css/christmas.css";
-    private static final String CHRISTMAS_AUDIO = "/audio/christmas_music.mp3";
+    private static final String CHRISTMAS_AUDIO = "/audio/music.mp3";
     private static final String PREF_THEME = "app_theme_christmas";
     private static final Preferences prefs = Preferences.userNodeForPackage(ThemeManager.class);
     private static MediaPlayer christmasPlayer;

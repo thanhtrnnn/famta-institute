@@ -1,265 +1,840 @@
 SET NOCOUNT ON;
--- Mac dinh mat khau (loai tai khoan) + "123"
+
+-- KHAI BÁO BIẾN HASH CŨ
 DECLARE @AdminPasswordHash NVARCHAR(64) = 'JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=';
 DECLARE @TeacherPasswordHash NVARCHAR(64) = 'zeOD7ujuekQArfehX3FvF5ouuXZGs34InrjW0E5mNBY=';
 DECLARE @GuardianPasswordHash NVARCHAR(64) = 'NdQ0j3NBEJow80GZ6H/fG6ynqDFI9vpEjtcfc3UztHU=';
 DECLARE @StudentPasswordHash NVARCHAR(64) = 'cDsKPWrXW2SaKK3efYPGJR2kV1SSY7x/9F7HCbCoRIs=';
 
--- Nam hoc
+-- 1. Nam hoc
 INSERT INTO NAMHOC (MaNamHoc, TenNamHoc, NgayBatDau, NgayKetThuc)
-SELECT src.MaNamHoc, src.TenNamHoc, src.NgayBatDau, src.NgayKetThuc
-FROM (VALUES
+VALUES
 	('NH00000001', N'Năm học 2024-2025', '2024-09-01', '2025-05-31'),
-	('NH00000002', N'Năm học 2023-2024', '2023-09-01', '2024-05-31')
-) AS src (MaNamHoc, TenNamHoc, NgayBatDau, NgayKetThuc)
-WHERE NOT EXISTS (
-	SELECT 1 FROM NAMHOC target WHERE target.MaNamHoc = src.MaNamHoc
-);
+	('NH00000002', N'Năm học 2023-2024', '2023-09-01', '2024-05-31'),
+	('NH00000003', N'Năm học 2022-2023', '2022-09-01', '2023-05-31');
 
--- Hoc ky
+-- 2. Hoc ky
 INSERT INTO HOCKY (MaHocKy, MaNamHoc, ThuTuKy, NgayBatDau, NgayKetThuc)
-SELECT src.MaHocKy, src.MaNamHoc, src.ThuTuKy, src.NgayBatDau, src.NgayKetThuc
-FROM (VALUES
+VALUES
 	('HK00000001', 'NH00000001', 1, '2024-09-01', '2025-01-15'),
 	('HK00000002', 'NH00000001', 2, '2025-01-16', '2025-05-31'),
-	('HK00000003', 'NH00000002', 1, '2023-09-01', '2024-01-15')
-) AS src (MaHocKy, MaNamHoc, ThuTuKy, NgayBatDau, NgayKetThuc)
-WHERE NOT EXISTS (
-	SELECT 1 FROM HOCKY target WHERE target.MaHocKy = src.MaHocKy
-);
+	('HK00000003', 'NH00000002', 1, '2023-09-01', '2024-01-15'),
+	('HK00000004', 'NH00000002', 2, '2024-01-16', '2024-05-31'),
+	('HK00000005', 'NH00000003', 1, '2022-09-01', '2023-01-15'),
+	('HK00000006', 'NH00000003', 2, '2023-01-16', '2023-05-31');
 
--- Khoi
+-- 3. Khối (3 khối)
 INSERT INTO KHOI (MaKhoi, TenKhoi, SoThuTu)
-SELECT src.MaKhoi, src.TenKhoi, src.SoThuTu
-FROM (VALUES
-	('KH00000001', N'Lớp 6', 6),
-	('KH00000002', N'Lớp 7', 7),
-	('KH00000003', N'Lớp 8', 8)
-) AS src (MaKhoi, TenKhoi, SoThuTu)
-WHERE NOT EXISTS (
-	SELECT 1 FROM KHOI target WHERE target.MaKhoi = src.MaKhoi
-);
+VALUES
+	('KH00000010', N'Lớp 10', 10),
+	('KH00000011', N'Lớp 11', 11),
+	('KH00000012', N'Lớp 12', 12);
 
--- Khoa
+-- 4. Khoa
 INSERT INTO KHOA (MaKhoa, TenKhoa)
-SELECT src.MaKhoa, src.TenKhoa
-FROM (VALUES
+VALUES
 	('K000000001', N'Khoa Tự nhiên'),
-	('K000000002', N'Khoa Khoa học xã hội'),
-	('K000000003', N'Khoa Ngoại ngữ')
-) AS src (MaKhoa, TenKhoa)
-WHERE NOT EXISTS (
-	SELECT 1 FROM KHOA target WHERE target.MaKhoa = src.MaKhoa
-);
+	('K000000002', N'Khoa Xã hội'),
+	('K000000003', N'Khoa Ngoại ngữ');
 
--- Mon hoc
+-- 5. Mon hoc
 INSERT INTO MONHOC (MaMonHoc, MaKhoa, TenMonHoc)
-SELECT src.MaMonHoc, src.MaKhoa, src.TenMonHoc
-FROM (VALUES
-	('MH00000001', 'K000000001', N'Toán nâng cao'),
-	('MH00000002', 'K000000001', N'Vật lý cơ bản'),
-	('MH00000003', 'K000000002', N'Ngữ văn ứng dụng'),
-	('MH00000004', 'K000000003', N'Tiếng Anh giao tiếp')
-) AS src (MaMonHoc, MaKhoa, TenMonHoc)
-WHERE NOT EXISTS (
-	SELECT 1 FROM MONHOC target WHERE target.MaMonHoc = src.MaMonHoc
-);
+VALUES
+	('MH00000001', 'K000000001', N'Toán học'),
+	('MH00000002', 'K000000001', N'Vật lý'),
+	('MH00000003', 'K000000002', N'Ngữ văn'),
+	('MH00000004', 'K000000003', N'Tiếng Anh'),
+	('MH00000005', 'K000000001', N'Hóa học'),
+	('MH00000006', 'K000000003', N'IELTS'),
+	('MH00000007', 'K000000003', N'Tiếng Trung'),
+	('MH00000008', 'K000000002', N'Lịch sử'),
+	('MH00000009', 'K000000002', N'Địa lý');
 
--- Giao vien
-INSERT INTO GIAOVIEN (MaGiaoVien, Ho, TenLot, Ten, GioiTinh, DiaChiEmail, SDT)
-SELECT src.MaGiaoVien, src.Ho, src.TenLot, src.Ten, src.GioiTinh, src.DiaChiEmail, src.SDT
-FROM (VALUES
-	('GV00000001', N'Phan', N'Da', N'Thi', N'Nữ', 'phanphan@gmail.com', '0909123456'),
-	('GV00000002', N'Nguyễn', N'Văn', N'Hoàng', N'Nam', 'hoang.nguyen@famta.edu.vn', '0909345678'),
-	('GV00000003', N'Trần', N'Thị', N'Lan', N'Nữ', 'lan.tran@famta.edu.vn', '0909456123'),
-	('GV00000004', N'Lê', N'Quang', N'Minh', N'Nam', 'minh.le@famta.edu.vn', '0912345678')
-) AS src (MaGiaoVien, Ho, TenLot, Ten, GioiTinh, DiaChiEmail, SDT)
-WHERE NOT EXISTS (
-	SELECT 1 FROM GIAOVIEN target WHERE target.MaGiaoVien = src.MaGiaoVien
-);
+-- 6. Giao vien (9 GV)
+INSERT INTO GIAOVIEN (MaGiaoVien, Ho, TenLot, Ten, GioiTinh, DiaChiEmail, SDT, TenDangNhap)
+VALUES
+	('GV00000001', N'Phan', N'Da', N'Thi', N'Nữ', 'phanphan@gmail.com', '0909123456', 'gv.thipd'),
+	('GV00000002', N'Nguyễn', N'Văn', N'Hoàng', N'Nam', 'hoang.nguyen@famta.edu.vn', '0909345678', 'gv.hoangnv'),
+	('GV00000003', N'Trần', N'Thị', N'Lan', N'Nữ', 'lan.tran@famta.edu.vn', '0909456123', 'gv.lantt'),
+	('GV00000004', N'Lê', N'Quang', N'Minh', N'Nam', 'minh.le@famta.edu.vn', '0912345678', 'gv.namlqm'),
+	('GV00000005', N'Nguyễn Gia', N'Đức', N'Trung', N'Nam', 'trungngd@gmail.com', '0910092005', 'gv.trungngd'),
+	('GV00000006', N'Nguyễn Thị', N'Thanh', N'Thủy', N'Nữ', 'tthuy@gmail.com', '0851234987', 'gv.thuyntt'),
+	('GV00000007', N'Đỗ', N'Minh', N'Ánh', N'Nữ', 'anh.do@famta.edu.vn', '0913456789', 'gv.anhdm'),
+	('GV00000008', N'Phạm', N'Xuân', N'Bảo', N'Nam', 'bao.pham@famta.edu.vn', '0914567890', 'gv.baopx'),
+	('GV00000009', N'Vũ', N'Thị', N'Cúc', N'Nữ', 'cuc.vu@famta.edu.vn', '0915678901', 'gv.cucvt');
 
--- Loai phong hoc
+-- 7. Loai phong hoc
 INSERT INTO LOAIPHONGHOC (MaLoaiPhongHoc, TenLoaiPhongHoc)
-SELECT src.MaLoaiPhongHoc, src.TenLoaiPhongHoc
-FROM (VALUES
+VALUES
 	('LPH0000001', N'Phòng học lý thuyết'),
 	('LPH0000002', N'Phòng thí nghiệm'),
-	('LPH0000003', N'Phòng ngoại ngữ')
-) AS src (MaLoaiPhongHoc, TenLoaiPhongHoc)
-WHERE NOT EXISTS (
-	SELECT 1 FROM LOAIPHONGHOC target WHERE target.MaLoaiPhongHoc = src.MaLoaiPhongHoc
-);
+	('LPH0000003', N'Phòng ngoại ngữ'),
+	('LPH0000004', N'Phòng thư viện');
 
--- Phong hoc
+-- 8. Phong hoc
 INSERT INTO PHONGHOC (MaPhongHoc, MaLoaiPhongHoc, TenPhongHoc)
-SELECT src.MaPhongHoc, src.MaLoaiPhongHoc, src.TenPhongHoc
-FROM (VALUES
+VALUES
 	('PH00000001', 'LPH0000001', N'P101'),
-	('PH00000002', 'LPH0000001', N'P202'),
-	('PH00000003', 'LPH0000002', N'LAB1'),
-	('PH00000004', 'LPH0000003', N'P305')
-) AS src (MaPhongHoc, MaLoaiPhongHoc, TenPhongHoc)
-WHERE NOT EXISTS (
-	SELECT 1 FROM PHONGHOC target WHERE target.MaPhongHoc = src.MaPhongHoc
-);
+	('PH00000002', 'LPH0000001', N'P102'),
+	('PH00000003', 'LPH0000001', N'P103'),
+	('PH00000004', 'LPH0000001', N'P201'),
+	('PH00000005', 'LPH0000001', N'P202'),
+	('PH00000006', 'LPH0000001', N'P203'),
+	('PH00000007', 'LPH0000001', N'P301'),
+	('PH00000008', 'LPH0000001', N'P302'),
+	('PH00000009', 'LPH0000001', N'P303'),
+	('PH00000010', 'LPH0000001', N'P401'),
+	('PH00000011', 'LPH0000001', N'P402'),
+	('PH00000012', 'LPH0000001', N'P403'),
+	('PH00000013', 'LPH0000002', N'LAB01'),
+	('PH00000014', 'LPH0000002', N'LAB02'),
+	('PH00000015', 'LPH0000002', N'LAB03'),
+	('PH00000016', 'LPH0000003', N'NN01'),
+	('PH00000017', 'LPH0000003', N'NN02'),
+	('PH00000018', 'LPH0000003', N'NN03'),
+	('PH00000019', 'LPH0000004', N'LIB01'),
+	('PH00000020', 'LPH0000004', N'LIB02'),
+	('PH00000021', 'LPH0000004', N'LIB03');
 
--- Tiet hoc
+-- 9. Tiet hoc
 INSERT INTO TIETHOC (MaTietHoc, MaNamHoc, TenTietHoc, ThoiGianBatDau, ThoiGianKetThuc)
-SELECT src.MaTietHoc, src.MaNamHoc, src.TenTietHoc, src.ThoiGianBatDau, src.ThoiGianKetThuc
-FROM (VALUES
+VALUES
 	('TH00000001', 'NH00000001', N'Tiết 1', '07:00:00', '07:45:00'),
 	('TH00000002', 'NH00000001', N'Tiết 2', '07:55:00', '08:40:00'),
 	('TH00000003', 'NH00000001', N'Tiết 3', '08:50:00', '09:35:00'),
-	('TH00000004', 'NH00000001', N'Tiết 4', '09:45:00', '10:30:00')
-) AS src (MaTietHoc, MaNamHoc, TenTietHoc, ThoiGianBatDau, ThoiGianKetThuc)
-WHERE NOT EXISTS (
-	SELECT 1 FROM TIETHOC target WHERE target.MaTietHoc = src.MaTietHoc
-);
+	('TH00000004', 'NH00000001', N'Tiết 4', '09:45:00', '10:30:00'),
+	('TH00000005', 'NH00000001', N'Tiết 5', '10:40:00', '11:25:00'),
+	('TH00000006', 'NH00000001', N'Tiết 6', '13:00:00', '13:45:00'),
+	('TH00000007', 'NH00000001', N'Tiết 7', '13:55:00', '14:40:00'),
+	('TH00000008', 'NH00000001', N'Tiết 8', '14:50:00', '15:35:00');
 
--- Lop hoc
+-- 10. Lop hoc (9 lớp)
 INSERT INTO LOPHOC (MaLopHoc, MaMonHoc, MaGiaoVien, MaHocKy, TietHocBatDau, TietHocKetThuc, MaPhongHoc, TenLopHoc)
-SELECT src.MaLopHoc, src.MaMonHoc, src.MaGiaoVien, src.MaHocKy, src.TietHocBatDau, src.TietHocKetThuc, src.MaPhongHoc, src.TenLopHoc
-FROM (VALUES
-	('LH00000001', 'MH00000001', 'GV00000001', 'HK00000001', 'TH00000001', 'TH00000001', 'PH00000001', N'Lớp tài năng Toán 6A1'),
-	('LH00000002', 'MH00000002', 'GV00000002', 'HK00000001', 'TH00000002', 'TH00000002', 'PH00000003', N'Vật lý cơ bản 6A1'),
-	('LH00000003', 'MH00000003', 'GV00000003', 'HK00000001', 'TH00000003', 'TH00000003', 'PH00000002', N'Ngữ văn ứng dụng 7A1'),
-	('LH00000004', 'MH00000004', 'GV00000004', 'HK00000002', 'TH00000004', 'TH00000004', 'PH00000004', N'Tiếng Anh giao tiếp 8A1')
-) AS src (MaLopHoc, MaMonHoc, MaGiaoVien, MaHocKy, TietHocBatDau, TietHocKetThuc, MaPhongHoc, TenLopHoc)
-WHERE NOT EXISTS (
-	SELECT 1 FROM LOPHOC target WHERE target.MaLopHoc = src.MaLopHoc
-);
+VALUES
+	-- Khối 10
+	('LH00000001', 'MH00000001', 'GV00000001', 'HK00000001', 'TH00000001', 'TH00000001', 'PH00000001', N'10A1'),
+	('LH00000002', 'MH00000002', 'GV00000002', 'HK00000001', 'TH00000002', 'TH00000002', 'PH00000002', N'10A2'),
+	('LH00000003', 'MH00000003', 'GV00000003', 'HK00000001', 'TH00000003', 'TH00000003', 'PH00000003', N'10A3'),
+	-- Khối 11
+	('LH00000004', 'MH00000004', 'GV00000004', 'HK00000001', 'TH00000004', 'TH00000004', 'PH00000004', N'11A1'),
+	('LH00000005', 'MH00000005', 'GV00000005', 'HK00000001', 'TH00000005', 'TH00000005', 'PH00000005', N'11A2'),
+	('LH00000006', 'MH00000006', 'GV00000006', 'HK00000001', 'TH00000006', 'TH00000006', 'PH00000006', N'11A3'),
+	-- Khối 12
+	('LH00000007', 'MH00000001', 'GV00000007', 'HK00000002', 'TH00000007', 'TH00000007', 'PH00000007', N'12A1'),
+	('LH00000008', 'MH00000002', 'GV00000008', 'HK00000002', 'TH00000008', 'TH00000008', 'PH00000008', N'12A2'),
+	('LH00000009', 'MH00000003', 'GV00000009', 'HK00000002', 'TH00000001', 'TH00000001', 'PH00000009', N'12A3');
 
--- Hoc sinh
+-- 11. HOCSINH (90 Học sinh)
 INSERT INTO HOCSINH (MaHocSinh, Ho, TenLot, Ten, NgaySinh, GioiTinh, NgayNhapHoc)
-SELECT src.MaHocSinh, src.Ho, src.TenLot, src.Ten, src.NgaySinh, src.GioiTinh, src.NgayNhapHoc
-FROM (VALUES
-	('HS00000001', N'Phạm', N'Tuấn', N'Anh', '2012-01-14', N'Nam', '2024-08-15'),
-	('HS00000002', N'Nguyễn', N'Bảo', N'Châu', '2012-03-25', N'Nữ', '2024-08-15'),
-	('HS00000003', N'Lê', N'Minh', N'Khôi', '2011-10-02', N'Nam', '2024-08-15'),
-	('HS00000004', N'Đỗ', N'Thị', N'Hồng', '2012-12-12', N'Nữ', '2024-08-15'),
-	('HS00000005', N'Trương', N'Gia', N'Phúc', '2011-08-05', N'Nam', '2023-08-15'),
-	('HS00000006', N'Võ', N'Khánh', N'Linh', '2012-04-18', N'Nữ', '2023-08-15')
-) AS src (MaHocSinh, Ho, TenLot, Ten, NgaySinh, GioiTinh, NgayNhapHoc)
-WHERE NOT EXISTS (
-	SELECT 1 FROM HOCSINH target WHERE target.MaHocSinh = src.MaHocSinh
-);
+VALUES
+	-- 10A1
+	('HS00000001', N'Nguyễn', N'Văn', N'An', '2009-09-05', N'Nam', '2024-08-15'),
+	('HS00000002', N'Trần', N'Thị', N'Bình', '2010-01-15', N'Nữ', '2024-08-15'),
+	('HS00000003', N'Phạm', N'Minh', N'Chi', '2009-08-20', N'Nam', '2024-08-15'),
+	('HS00000004', N'Hoàng', N'Thu', N'Dũng', '2010-03-10', N'Nữ', '2024-08-15'),
+	('HS00000005', N'Đỗ', N'Đức', N'Em', '2009-10-25', N'Nam', '2024-08-15'),
+	('HS00000006', N'Võ', N'Kiến', N'Phúc', '2010-02-12', N'Nữ', '2024-08-15'),
+	('HS00000007', N'Lê', N'Văn', N'Giang', '2009-11-30', N'Nam', '2024-08-15'),
+	('HS00000008', N'Phan', N'Thị', N'Huy', '2010-04-01', N'Nữ', '2024-08-15'),
+	('HS00000009', N'Tô', N'Anh', N'Khôi', '2009-07-18', N'Nam', '2024-08-15'),
+	('HS00000010', N'Bùi', N'Xuân', N'Linh', '2010-01-01', N'Nữ', '2024-08-15'),
+	-- 10A2
+	('HS00000011', N'Dương', N'Quang', N'Minh', '2009-12-10', N'Nam', '2024-08-15'),
+	('HS00000012', N'Lý', N'Hữu', N'Nghĩa', '2010-03-25', N'Nữ', '2024-08-15'),
+	('HS00000013', N'Mai', N'Thanh', N'Phong', '2009-08-01', N'Nam', '2024-08-15'),
+	('HS00000014', N'Tông', N'Vân', N'Quang', '2010-05-08', N'Nữ', '2024-08-15'),
+	('HS00000015', N'Lưu', N'Hợp', N'Sơn', '2009-09-15', N'Nam', '2024-08-15'),
+	('HS00000016', N'Nông', N'Văn', N'Tùng', '2009-11-01', N'Nam', '2024-08-15'),
+	('HS00000017', N'Tạ', N'Thị', N'Thư', '2010-02-05', N'Nữ', '2024-08-15'),
+	('HS00000018', N'Hồ', N'Minh', N'Trí', '2009-08-25', N'Nam', '2024-08-15'),
+	('HS00000019', N'Vũ', N'Thu', N'Uyên', '2010-04-12', N'Nữ', '2024-08-15'),
+	('HS00000020', N'Đặng', N'Đức', N'Việt', '2009-10-10', N'Nam', '2024-08-15'),
+	-- 10A3
+	('HS00000021', N'Nguyễn', N'Kiến', N'Xanh', '2010-01-20', N'Nữ', '2024-08-15'),
+	('HS00000022', N'Trần', N'Văn', N'Yên', '2009-12-01', N'Nam', '2024-08-15'),
+	('HS00000023', N'Phạm', N'Thị', N'Ánh', '2010-03-01', N'Nữ', '2024-08-15'),
+	('HS00000024', N'Hoàng', N'Anh', N'Bách', '2009-07-25', N'Nam', '2024-08-15'),
+	('HS00000025', N'Đỗ', N'Xuân', N'Cảnh', '2010-01-10', N'Nữ', '2024-08-15'),
+	('HS00000026', N'Võ', N'Quang', N'Đan', '2009-11-20', N'Nam', '2024-08-15'),
+	('HS00000027', N'Lê', N'Hữu', N'Hải', '2010-04-05', N'Nữ', '2024-08-15'),
+	('HS00000028', N'Phan', N'Thanh', N'Khánh', '2009-08-15', N'Nam', '2024-08-15'),
+	('HS00000029', N'Tô', N'Vân', N'Lam', '2010-05-01', N'Nữ', '2024-08-15'),
+	('HS00000030', N'Bùi', N'Hợp', N'Mạnh', '2009-09-20', N'Nam', '2024-08-15'),
+	-- 11A1
+	('HS00000031', N'Dương', N'Văn', N'Nam', '2008-09-05', N'Nam', '2023-08-15'),
+	('HS00000032', N'Lý', N'Thị', N'Ngọc', '2009-01-15', N'Nữ', '2023-08-15'),
+	('HS00000033', N'Mai', N'Minh', N'Oanh', '2008-08-20', N'Nam', '2023-08-15'),
+	('HS00000034', N'Tông', N'Thu', N'Phú', '2009-03-10', N'Nữ', '2023-08-15'),
+	('HS00000035', N'Lưu', N'Đức', N'Quý', '2008-10-25', N'Nam', '2023-08-15'),
+	('HS00000036', N'Nông', N'Kiến', N'Rạng', '2009-02-12', N'Nữ', '2023-08-15'),
+	('HS00000037', N'Tạ', N'Văn', N'Sang', '2008-11-30', N'Nam', '2023-08-15'),
+	('HS00000038', N'Hồ', N'Thị', N'Thảo', '2009-04-01', N'Nữ', '2023-08-15'),
+	('HS00000039', N'Vũ', N'Anh', N'Tiến', '2008-07-18', N'Nam', '2023-08-15'),
+	('HS00000040', N'Đặng', N'Xuân', N'Trâm', '2009-01-01', N'Nữ', '2023-08-15'),
+	-- 11A2
+	('HS00000041', N'Nguyễn', N'Quang', N'Tú', '2008-12-10', N'Nam', '2023-08-15'),
+	('HS00000042', N'Trần', N'Hữu', N'Uyên', '2009-03-25', N'Nữ', '2023-08-15'),
+	('HS00000043', N'Phạm', N'Thanh', N'Văn', '2008-08-01', N'Nam', '2023-08-15'),
+	('HS00000044', N'Hoàng', N'Vân', N'Xinh', '2009-05-08', N'Nữ', '2023-08-15'),
+	('HS00000045', N'Đỗ', N'Hợp', N'Yến', '2008-09-15', N'Nam', '2023-08-15'),
+	('HS00000046', N'Võ', N'Văn', N'Anh', '2008-11-01', N'Nam', '2023-08-15'),
+	('HS00000047', N'Lê', N'Thị', N'Bảo', '2009-02-05', N'Nữ', '2023-08-15'),
+	('HS00000048', N'Phan', N'Minh', N'Châu', '2008-08-25', N'Nam', '2023-08-15'),
+	('HS00000049', N'Tô', N'Thu', N'Đan', '2009-04-12', N'Nữ', '2023-08-15'),
+	('HS00000050', N'Bùi', N'Đức', N'Hải', '2008-10-10', N'Nam', '2023-08-15'),
+	-- 11A3
+	('HS00000051', N'Dương', N'Kiến', N'Hằng', '2009-01-20', N'Nữ', '2023-08-15'),
+	('HS00000052', N'Lý', N'Văn', N'Long', '2008-12-01', N'Nam', '2023-08-15'),
+	('HS00000053', N'Mai', N'Thị', N'Lý', '2009-03-01', N'Nữ', '2023-08-15'),
+	('HS00000054', N'Tông', N'Anh', N'Mẫn', '2008-07-25', N'Nam', '2023-08-15'),
+	('HS00000055', N'Lưu', N'Xuân', N'Nhi', '2009-01-10', N'Nữ', '2023-08-15'),
+	('HS00000056', N'Nông', N'Quang', N'Phúc', '2008-11-20', N'Nam', '2023-08-15'),
+	('HS00000057', N'Tạ', N'Hữu', N'Thành', '2009-04-05', N'Nữ', '2023-08-15'),
+	('HS00000058', N'Hồ', N'Thanh', N'Trung', '2008-08-15', N'Nam', '2023-08-15'),
+	('HS00000059', N'Vũ', N'Vân', N'Tuyền', '2009-05-01', N'Nữ', '2023-08-15'),
+	('HS00000060', N'Đặng', N'Hợp', N'Việt', '2008-09-20', N'Nam', '2023-08-15'),
+	-- 12A1
+	('HS00000061', N'Nguyễn', N'Văn', N'Chi', '2007-09-05', N'Nam', '2022-08-15'),
+	('HS00000062', N'Trần', N'Thị', N'Dung', '2008-01-15', N'Nữ', '2022-08-15'),
+	('HS00000063', N'Phạm', N'Minh', N'Khoa', '2007-08-20', N'Nam', '2022-08-15'),
+	('HS00000064', N'Hoàng', N'Thu', N'Liên', '2008-03-10', N'Nữ', '2022-08-15'),
+	('HS00000065', N'Đỗ', N'Đức', N'Lợi', '2007-10-25', N'Nam', '2022-08-15'),
+	('HS00000066', N'Võ', N'Kiến', N'Mai', '2008-02-12', N'Nữ', '2022-08-15'),
+	('HS00000067', N'Lê', N'Văn', N'Nghiêm', '2007-11-30', N'Nam', '2022-08-15'),
+	('HS00000068', N'Phan', N'Thị', N'Oanh', '2008-04-01', N'Nữ', '2022-08-15'),
+	('HS00000069', N'Tô', N'Anh', N'Phúc', '2007-07-18', N'Nam', '2022-08-15'),
+	('HS00000070', N'Bùi', N'Xuân', N'Quang', '2008-01-01', N'Nữ', '2022-08-15'),
+	-- 12A2
+	('HS00000071', N'Dương', N'Quang', N'Sơn', '2007-12-10', N'Nam', '2022-08-15'),
+	('HS00000072', N'Lý', N'Hữu', N'Thúy', '2008-03-25', N'Nữ', '2022-08-15'),
+	('HS00000073', N'Mai', N'Thanh', N'Trang', '2007-08-01', N'Nam', '2022-08-15'),
+	('HS00000074', N'Tông', N'Vân', N'Viên', '2008-05-08', N'Nữ', '2022-08-15'),
+	('HS00000075', N'Lưu', N'Hợp', N'Yên', '2007-09-15', N'Nam', '2022-08-15'),
+	('HS00000076', N'Nông', N'Văn', N'Ánh', '2007-11-01', N'Nam', '2022-08-15'),
+	('HS00000077', N'Tạ', N'Thị', N'Bích', '2008-02-05', N'Nữ', '2022-08-15'),
+	('HS00000078', N'Hồ', N'Minh', N'Cường', '2007-08-25', N'Nam', '2022-08-15'),
+	('HS00000079', N'Vũ', N'Thu', N'Đạt', '2008-04-12', N'Nữ', '2022-08-15'),
+	('HS00000080', N'Đặng', N'Đức', N'Giang', '2007-10-10', N'Nam', '2022-08-15'),
+	-- 12A3
+	('HS00000081', N'Nguyễn', N'Kiến', N'Hải', '2008-01-20', N'Nữ', '2022-08-15'),
+	('HS00000082', N'Trần', N'Văn', N'Khoa', '2007-12-01', N'Nam', '2022-08-15'),
+	('HS00000083', N'Phạm', N'Thị', N'Lam', '2008-03-01', N'Nữ', '2022-08-15'),
+	('HS00000084', N'Hoàng', N'Anh', N'Linh', '2007-07-25', N'Nam', '2022-08-15'),
+	('HS00000085', N'Đỗ', N'Xuân', N'Minh', '2008-01-10', N'Nữ', '2022-08-15'),
+	('HS00000086', N'Võ', N'Quang', N'Ngân', '2007-11-20', N'Nam', '2022-08-15'),
+	('HS00000087', N'Lê', N'Hữu', N'Phương', '2008-04-05', N'Nữ', '2022-08-15'),
+	('HS00000088', N'Phan', N'Thanh', N'Quý', '2007-08-15', N'Nam', '2022-08-15'),
+	('HS00000089', N'Tô', N'Vân', N'Sơn', '2008-05-01', N'Nữ', '2022-08-15'),
+	('HS00000090', N'Bùi', N'Hợp', N'Tài', '2007-09-20', N'Nam', '2022-08-15');
 
--- Loai nguoi giam ho
+-- 12. Loai nguoi giam ho [FIXED: Mã 10 ký tự, không bị lỗi truncated]
 INSERT INTO LOAINGUOIGIAMHO (MaLoaiNguoiGiamHo, Ten)
-SELECT src.MaLoaiNguoiGiamHo, src.Ten
-FROM (VALUES
-	('LGH0000001', N'Cha'),
-	('LGH0000002', N'Mẹ'),
+VALUES
+	('LGH0000001', N'Bố'),
+	('LGH0000002', N'Mẹ'),  -- Đã sửa từ LGH00000002 (11 ký tự) thành LGH0000002 (10 ký tự)
 	('LGH0000003', N'Ông'),
-	('LGH0000004', N'Bà')
-) AS src (MaLoaiNguoiGiamHo, Ten)
-WHERE NOT EXISTS (
-	SELECT 1 FROM LOAINGUOIGIAMHO target WHERE target.MaLoaiNguoiGiamHo = src.MaLoaiNguoiGiamHo
-);
+	('LGH0000004', N'Bà');
 
--- Nguoi giam ho
-INSERT INTO NGUOIGIAMHO (MaNguoiGiamHo, Ho, TenLot, Ten, DiaChiEmail, SDT)
-SELECT src.MaNguoiGiamHo, src.Ho, src.TenLot, src.Ten, src.DiaChiEmail, src.SDT
-FROM (VALUES
-	('GH00000001', N'Trần', N'Xuân', N'Thành', 'thanhchan@gmail.com', '0123456789'),
-	('GH00000002', N'Lê', N'Thị', N'Mai', 'le.mai@gmail.com', '0936363636'),
-	('GH00000003', N'Nguyễn', N'Đức', N'Phúc', 'phuc.nguyen@gmail.com', '0987654321'),
-	('GH00000004', N'Phạm', N'Thị', N'Hương', 'huong.pham@gmail.com', '0912345678'),
-	('GH00000005', N'Đỗ', N'Minh', N'Đức', 'duc.do@gmail.com', '0976543210'),
-	('GH00000006', N'Võ', N'Thị', N'Thanh', 'thanh.vo@gmail.com', '0965432109')
-) AS src (MaNguoiGiamHo, Ho, TenLot, Ten, DiaChiEmail, SDT)
-WHERE NOT EXISTS (
-	SELECT 1 FROM NGUOIGIAMHO target WHERE target.MaNguoiGiamHo = src.MaNguoiGiamHo
-);
+-- 13. Nguoigiamho
+INSERT INTO NGUOIGIAMHO (MaNguoiGiamHo, Ho, TenLot, Ten, DiaChiEmail)
+VALUES
+	('GH00000001', N'Nguyễn', N'Xuân', N'Thành', 'ghamho0@gmail.com'),
+	('GH00000002', N'Trần', N'Thị', N'Mai', 'ghamho1@gmail.com'),
+	('GH00000003', N'Phạm', N'Minh', N'Phúc', 'ghamho2@gmail.com'),
+	('GH00000004', N'Hoàng', N'Quang', N'Hương', 'ghamho3@gmail.com'),
+	('GH00000005', N'Đỗ', N'Hữu', N'Đức', 'ghamho4@gmail.com'),
+	('GH00000006', N'Võ', N'Thu', N'Thanh', 'ghamho5@gmail.com'),
+	('GH00000007', N'Lê', N'Tuấn', N'Chinh', 'ghamho6@gmail.com'),
+	('GH00000008', N'Phan', N'Bảo', N'Hằng', 'ghamho7@gmail.com'),
+	('GH00000009', N'Tô', N'Cúc', N'Long', 'ghamho8@gmail.com'),
+	('GH00000010', N'Bùi', N'Duy', N'Hạnh', 'ghamho9@gmail.com'),
+	('GH00000011', N'Dương', N'Em', N'Tâm', 'ghamho10@gmail.com'),
+	('GH00000012', N'Lý', N'Phương', N'Trang', 'ghamho11@gmail.com'),
+	('GH00000013', N'Mai', N'Giang', N'Vũ', 'ghamho12@gmail.com'),
+	('GH00000014', N'Tông', N'Hải', N'Vân', 'ghamho13@gmail.com'),
+	('GH00000015', N'Lưu', N'Hùng', N'Vương', 'ghamho14@gmail.com'),
+	('GH00000016', N'Nông', N'Như', N'Vy', 'ghamho15@gmail.com'),
+	('GH00000017', N'Tạ', N'Khoa', N'Yên', 'ghamho16@gmail.com'),
+	('GH00000018', N'Hồ', N'Thanh', N'Zach', 'ghamho17@gmail.com'),
+	('GH00000019', N'Vũ', N'Liên', N'Anh', 'ghamho18@gmail.com'),
+	('GH00000020', N'Đặng', N'Anh', N'Bình', 'ghamho19@gmail.com'),
+	('GH00000021', N'Nguyễn', N'Vân', N'Cương', 'ghamho20@gmail.com'),
+	('GH00000022', N'Trần', N'Hợp', N'Dương', 'ghamho21@gmail.com'),
+	('GH00000023', N'Phạm', N'Giao', N'Ế', 'ghamho22@gmail.com'),
+	('GH00000024', N'Hoàng', N'Sơn', N'Quỳnh', 'ghamho23@gmail.com'),
+	('GH00000025', N'Đỗ', N'Phúc', N'Giao', 'ghamho24@gmail.com'),
+	('GH00000026', N'Võ', N'Hân', N'Hoàng', 'ghamho25@gmail.com'),
+	('GH00000027', N'Lê', N'Khánh', N'Ích', 'ghamho26@gmail.com'),
+	('GH00000028', N'Phan', N'Ông', N'Khánh', 'ghamho27@gmail.com'),
+	('GH00000029', N'Tô', N'Bà', N'Lợi', 'ghamho28@gmail.com'),
+	('GH00000030', N'Bùi', N'Chú', N'Mạnh', 'ghamho29@gmail.com'),
+	('GH00000031', N'Dương', N'Xuân', N'Nam', 'ghamho30@gmail.com'),
+	('GH00000032', N'Lý', N'Thị', N'Ơi', 'ghamho31@gmail.com'),
+	('GH00000033', N'Mai', N'Minh', N'Pháp', 'ghamho32@gmail.com'),
+	('GH00000034', N'Tông', N'Quang', N'Quý', 'ghamho33@gmail.com'),
+	('GH00000035', N'Lưu', N'Hữu', N'Rượu', 'ghamho34@gmail.com'),
+	('GH00000036', N'Nông', N'Thu', N'Sánh', 'ghamho35@gmail.com'),
+	('GH00000037', N'Tạ', N'Tuấn', N'Tâu', 'ghamho36@gmail.com'),
+	('GH00000038', N'Hồ', N'Bảo', N'Ủy', 'ghamho37@gmail.com'),
+	('GH00000039', N'Vũ', N'Cúc', N'Uy', 'ghamho38@gmail.com'),
+	('GH00000040', N'Đặng', N'Duy', N'Tịnh', 'ghamho39@gmail.com'),
+	('GH00000041', N'Nguyễn', N'Em', N'Thành', 'ghamho40@gmail.com'),
+	('GH00000042', N'Trần', N'Phương', N'Mai', 'ghamho41@gmail.com'),
+	('GH00000043', N'Phạm', N'Giang', N'Phúc', 'ghamho42@gmail.com'),
+	('GH00000044', N'Hoàng', N'Hải', N'Hương', 'ghamho43@gmail.com'),
+	('GH00000045', N'Đỗ', N'Hùng', N'Đức', 'ghamho44@gmail.com'),
+	('GH00000046', N'Võ', N'Như', N'Thanh', 'ghamho45@gmail.com'),
+	('GH00000047', N'Lê', N'Khoa', N'Chinh', 'ghamho46@gmail.com'),
+	('GH00000048', N'Phan', N'Thanh', N'Hằng', 'ghamho47@gmail.com'),
+	('GH00000049', N'Tô', N'Liên', N'Long', 'ghamho48@gmail.com'),
+	('GH00000050', N'Bùi', N'Anh', N'Hạnh', 'ghamho49@gmail.com'),
+	('GH00000051', N'Dương', N'Vân', N'Tâm', 'ghamho50@gmail.com'),
+	('GH00000052', N'Lý', N'Hợp', N'Trang', 'ghamho51@gmail.com'),
+	('GH00000053', N'Mai', N'Giao', N'Vũ', 'ghamho52@gmail.com'),
+	('GH00000054', N'Tông', N'Sơn', N'Vân', 'ghamho53@gmail.com'),
+	('GH00000055', N'Lưu', N'Phúc', N'Vương', 'ghamho54@gmail.com'),
+	('GH00000056', N'Nông', N'Hân', N'Vy', 'ghamho55@gmail.com'),
+	('GH00000057', N'Tạ', N'Khánh', N'Yên', 'ghamho56@gmail.com'),
+	('GH00000058', N'Hồ', N'Ông', N'Zach', 'ghamho57@gmail.com'),
+	('GH00000059', N'Vũ', N'Bà', N'Anh', 'ghamho58@gmail.com'),
+	('GH00000060', N'Đặng', N'Chú', N'Bình', 'ghamho59@gmail.com'),
+	('GH00000061', N'Nguyễn', N'Xuân', N'Cương', 'ghamho60@gmail.com'),
+	('GH00000062', N'Trần', N'Thị', N'Dương', 'ghamho61@gmail.com'),
+	('GH00000063', N'Phạm', N'Minh', N'Ế', 'ghamho62@gmail.com'),
+	('GH00000064', N'Hoàng', N'Quang', N'Quỳnh', 'ghamho63@gmail.com'),
+	('GH00000065', N'Đỗ', N'Hữu', N'Giao', 'ghamho64@gmail.com'),
+	('GH00000066', N'Võ', N'Thu', N'Hoàng', 'ghamho65@gmail.com'),
+	('GH00000067', N'Lê', N'Tuấn', N'Ích', 'ghamho66@gmail.com'),
+	('GH00000068', N'Phan', N'Bảo', N'Khánh', 'ghamho67@gmail.com'),
+	('GH00000069', N'Tô', N'Cúc', N'Lợi', 'ghamho68@gmail.com'),
+	('GH00000070', N'Bùi', N'Duy', N'Mạnh', 'ghamho69@gmail.com'),
+	('GH00000071', N'Dương', N'Em', N'Nam', 'ghamho70@gmail.com'),
+	('GH00000072', N'Lý', N'Phương', N'Ơi', 'ghamho71@gmail.com'),
+	('GH00000073', N'Mai', N'Giang', N'Pháp', 'ghamho72@gmail.com'),
+	('GH00000074', N'Tông', N'Hải', N'Quý', 'ghamho73@gmail.com'),
+	('GH00000075', N'Lưu', N'Hùng', N'Rượu', 'ghamho74@gmail.com'),
+	('GH00000076', N'Nông', N'Như', N'Sánh', 'ghamho75@gmail.com'),
+	('GH00000077', N'Tạ', N'Khoa', N'Tâu', 'ghamho76@gmail.com'),
+	('GH00000078', N'Hồ', N'Thanh', N'Ủy', 'ghamho77@gmail.com'),
+	('GH00000079', N'Vũ', N'Liên', N'Uy', 'ghamho78@gmail.com'),
+	('GH00000080', N'Đặng', N'Anh', N'Tịnh', 'ghamho79@gmail.com'),
+	('GH00000081', N'Nguyễn', N'Vân', N'Thành', 'ghamho80@gmail.com'),
+	('GH00000082', N'Trần', N'Hợp', N'Mai', 'ghamho81@gmail.com'),
+	('GH00000083', N'Phạm', N'Giao', N'Phúc', 'ghamho82@gmail.com'),
+	('GH00000084', N'Hoàng', N'Sơn', N'Hương', 'ghamho83@gmail.com'),
+	('GH00000085', N'Đỗ', N'Phúc', N'Đức', 'ghamho84@gmail.com'),
+	('GH00000086', N'Võ', N'Hân', N'Thanh', 'ghamho85@gmail.com'),
+	('GH00000087', N'Lê', N'Khánh', N'Chinh', 'ghamho86@gmail.com'),
+	('GH00000088', N'Phan', N'Ông', N'Hằng', 'ghamho87@gmail.com'),
+	('GH00000089', N'Tô', N'Bà', N'Long', 'ghamho88@gmail.com'),
+	('GH00000090', N'Bùi', N'Chú', N'Hạnh', 'ghamho89@gmail.com');
 
--- Lien ket hoc sinh - nguoi giam ho
+-- 14. HOCSINH_NGUOIGIAMHO [FIXED: Mã 10 ký tự, không bị lỗi FK]
 INSERT INTO HOCSINH_NGUOIGIAMHO (MaHocSinh, MaNguoiGiamHo, MaLoaiNguoiGiamHo)
-SELECT src.MaHocSinh, src.MaNguoiGiamHo, src.MaLoaiNguoiGiamHo
-FROM (VALUES
+VALUES
 	('HS00000001', 'GH00000001', 'LGH0000001'),
-	('HS00000001', 'GH00000002', 'LGH0000002'),
-	('HS00000002', 'GH00000003', 'LGH0000001'),
-	('HS00000002', 'GH00000004', 'LGH0000002'),
-	('HS00000003', 'GH00000005', 'LGH0000001'),
-	('HS00000004', 'GH00000006', 'LGH0000002'),
+	('HS00000002', 'GH00000002', 'LGH0000002'),
+	('HS00000003', 'GH00000003', 'LGH0000003'),
+	('HS00000004', 'GH00000004', 'LGH0000004'),
 	('HS00000005', 'GH00000005', 'LGH0000001'),
-	('HS00000006', 'GH00000004', 'LGH0000002')
-) AS src (MaHocSinh, MaNguoiGiamHo, MaLoaiNguoiGiamHo)
-WHERE NOT EXISTS (
-	SELECT 1
-	FROM HOCSINH_NGUOIGIAMHO target
-	WHERE target.MaHocSinh = src.MaHocSinh
-		AND target.MaNguoiGiamHo = src.MaNguoiGiamHo
-		AND target.MaLoaiNguoiGiamHo = src.MaLoaiNguoiGiamHo
-);
+	('HS00000006', 'GH00000006', 'LGH0000002'),
+	('HS00000007', 'GH00000007', 'LGH0000003'),
+	('HS00000008', 'GH00000008', 'LGH0000004'),
+	('HS00000009', 'GH00000009', 'LGH0000001'),
+	('HS00000010', 'GH00000010', 'LGH0000002'),
+	('HS00000011', 'GH00000011', 'LGH0000003'),
+	('HS00000012', 'GH00000012', 'LGH0000004'),
+	('HS00000013', 'GH00000013', 'LGH0000001'),
+	('HS00000014', 'GH00000014', 'LGH0000002'),
+	('HS00000015', 'GH00000015', 'LGH0000003'),
+	('HS00000016', 'GH00000016', 'LGH0000004'),
+	('HS00000017', 'GH00000017', 'LGH0000001'),
+	('HS00000018', 'GH00000018', 'LGH0000002'),
+	('HS00000019', 'GH00000019', 'LGH0000003'),
+	('HS00000020', 'GH00000020', 'LGH0000004'),
+	('HS00000021', 'GH00000021', 'LGH0000001'),
+	('HS00000022', 'GH00000022', 'LGH0000002'),
+	('HS00000023', 'GH00000023', 'LGH0000003'),
+	('HS00000024', 'GH00000024', 'LGH0000004'),
+	('HS00000025', 'GH00000025', 'LGH0000001'),
+	('HS00000026', 'GH00000026', 'LGH0000002'),
+	('HS00000027', 'GH00000027', 'LGH0000003'),
+	('HS00000028', 'GH00000028', 'LGH0000004'),
+	('HS00000029', 'GH00000029', 'LGH0000001'),
+	('HS00000030', 'GH00000030', 'LGH0000002'),
+	('HS00000031', 'GH00000031', 'LGH0000003'),
+	('HS00000032', 'GH00000032', 'LGH0000004'),
+	('HS00000033', 'GH00000033', 'LGH0000001'),
+	('HS00000034', 'GH00000034', 'LGH0000002'),
+	('HS00000035', 'GH00000035', 'LGH0000003'),
+	('HS00000036', 'GH00000036', 'LGH0000004'),
+	('HS00000037', 'GH00000037', 'LGH0000001'),
+	('HS00000038', 'GH00000038', 'LGH0000002'),
+	('HS00000039', 'GH00000039', 'LGH0000003'),
+	('HS00000040', 'GH00000040', 'LGH0000004'),
+	('HS00000041', 'GH00000041', 'LGH0000001'),
+	('HS00000042', 'GH00000042', 'LGH0000002'),
+	('HS00000043', 'GH00000043', 'LGH0000003'),
+	('HS00000044', 'GH00000044', 'LGH0000004'),
+	('HS00000045', 'GH00000045', 'LGH0000001'),
+	('HS00000046', 'GH00000046', 'LGH0000002'),
+	('HS00000047', 'GH00000047', 'LGH0000003'),
+	('HS00000048', 'GH00000048', 'LGH0000004'),
+	('HS00000049', 'GH00000049', 'LGH0000001'),
+	('HS00000050', 'GH00000050', 'LGH0000002'),
+	('HS00000051', 'GH00000051', 'LGH0000003'),
+	('HS00000052', 'GH00000052', 'LGH0000004'),
+	('HS00000053', 'GH00000053', 'LGH0000001'),
+	('HS00000054', 'GH00000054', 'LGH0000002'),
+	('HS00000055', 'GH00000055', 'LGH0000003'),
+	('HS00000056', 'GH00000056', 'LGH0000004'),
+	('HS00000057', 'GH00000057', 'LGH0000001'),
+	('HS00000058', 'GH00000058', 'LGH0000002'),
+	('HS00000059', 'GH00000059', 'LGH0000003'),
+	('HS00000060', 'GH00000060', 'LGH0000004'),
+	('HS00000061', 'GH00000061', 'LGH0000001'),
+	('HS00000062', 'GH00000062', 'LGH0000002'),
+	('HS00000063', 'GH00000063', 'LGH0000003'),
+	('HS00000064', 'GH00000064', 'LGH0000004'),
+	('HS00000065', 'GH00000065', 'LGH0000001'),
+	('HS00000066', 'GH00000066', 'LGH0000002'),
+	('HS00000067', 'GH00000067', 'LGH0000003'),
+	('HS00000068', 'GH00000068', 'LGH0000004'),
+	('HS00000069', 'GH00000069', 'LGH0000001'),
+	('HS00000070', 'GH00000070', 'LGH0000002'),
+	('HS00000071', 'GH00000071', 'LGH0000003'),
+	('HS00000072', 'GH00000072', 'LGH0000004'),
+	('HS00000073', 'GH00000073', 'LGH0000001'),
+	('HS00000074', 'GH00000074', 'LGH0000002'),
+	('HS00000075', 'GH00000075', 'LGH0000003'),
+	('HS00000076', 'GH00000076', 'LGH0000004'),
+	('HS00000077', 'GH00000077', 'LGH0000001'),
+	('HS00000078', 'GH00000078', 'LGH0000002'),
+	('HS00000079', 'GH00000079', 'LGH0000003'),
+	('HS00000080', 'GH00000080', 'LGH0000004'),
+	('HS00000081', 'GH00000081', 'LGH0000001'),
+	('HS00000082', 'GH00000082', 'LGH0000002'),
+	('HS00000083', 'GH00000083', 'LGH0000003'),
+	('HS00000084', 'GH00000084', 'LGH0000004'),
+	('HS00000085', 'GH00000085', 'LGH0000001'),
+	('HS00000086', 'GH00000086', 'LGH0000002'),
+	('HS00000087', 'GH00000087', 'LGH0000003'),
+	('HS00000088', 'GH00000088', 'LGH0000004'),
+	('HS00000089', 'GH00000089', 'LGH0000001'),
+	('HS00000090', 'GH00000090', 'LGH0000002');
 
--- Tai khoan demo theo vai tro
+-- 15. TAI KHOAN [FIXED: Đã xử lý trùng lặp bằng cách thêm số, tất cả tài khoản đều duy nhất]
 INSERT INTO TAIKHOAN (TenDangNhap, MatKhauHash, Quyen)
-SELECT src.TenDangNhap, src.MatKhauHash, src.Quyen
-FROM (VALUES
+VALUES
+	-- 4 Tài khoản cố định
 	('admin', @AdminPasswordHash, 'ADMIN'),
 	('teacher', @TeacherPasswordHash, 'GIAO_VIEN'),
 	('guardian', @GuardianPasswordHash, 'PHU_HUYNH'),
 	('student', @StudentPasswordHash, 'HOC_VIEN'),
+	
+	-- 9 Tài khoản Giáo viên (Đảm bảo duy nhất)
 	('gv.thipd', @TeacherPasswordHash, 'GIAO_VIEN'),
 	('gv.hoangnv', @TeacherPasswordHash, 'GIAO_VIEN'),
 	('gv.lantt', @TeacherPasswordHash, 'GIAO_VIEN'),
-	('gv.minhlq', @TeacherPasswordHash, 'GIAO_VIEN'),
-	('ngh.thanhtx', @GuardianPasswordHash, 'PHU_HUYNH'),
-	('ngh.mailt', @GuardianPasswordHash, 'PHU_HUYNH'),
-	('ngh.phucnd', @GuardianPasswordHash, 'PHU_HUYNH'),
-	('ngh.huongpt', @GuardianPasswordHash, 'PHU_HUYNH'),
-	('ngh.ducdm', @GuardianPasswordHash, 'PHU_HUYNH'),
-	('ngh.thanhvt', @GuardianPasswordHash, 'PHU_HUYNH'),
-	('hs.anhpt', @StudentPasswordHash, 'HOC_VIEN'),
-	('hs.chaunb', @StudentPasswordHash, 'HOC_VIEN'),
-	('hs.khoilm', @StudentPasswordHash, 'HOC_VIEN'),
-	('hs.hongdt', @StudentPasswordHash, 'HOC_VIEN'),
-	('hs.phuctg', @StudentPasswordHash, 'HOC_VIEN'),
-	('hs.linhvk', @StudentPasswordHash, 'HOC_VIEN')
-) AS src (TenDangNhap, MatKhauHash, Quyen)
-WHERE NOT EXISTS (
-	SELECT 1 FROM TAIKHOAN target WHERE target.TenDangNhap = src.TenDangNhap
-);
+	('gv.namlqm', @TeacherPasswordHash, 'GIAO_VIEN'),
+	('gv.trungngd', @TeacherPasswordHash, 'GIAO_VIEN'),
+	('gv.thuyntt', @TeacherPasswordHash, 'GIAO_VIEN'),
+	('gv.anhdm', @TeacherPasswordHash, 'GIAO_VIEN'),
+	('gv.baopx', @TeacherPasswordHash, 'GIAO_VIEN'),
+	('gv.cucvt', @TeacherPasswordHash, 'GIAO_VIEN'),
+	
+	-- 90 Tài khoản Người giám hộ (Đã thêm số thứ tự cho tên trùng)
+	('gh.thanhxn', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.maitt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.phucmp', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.huongqh', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.duchd', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.thanhtt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.chinhlt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.hangpb', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.longtc', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.hanhbd', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.tamde', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.tranglp', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.vumg', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.vanth', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.vuonglh', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.vyng', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.yentk', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.zachht', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.anhvl', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.binhda', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.cuongnx', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.duongtht', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.etp', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.quynhhs', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.giaodp', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.hoangvh', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.ichlk', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.khanhpo', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.loivt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.manhbd', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.namdx', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.oitl', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.phapmm', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.quytq', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.ruoulh', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.sanhnv', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.tautg', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.uyhh', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.vutc', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.tinhda', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.thanhne', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.maift', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.phucpg', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.huonghh', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.ducde', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.thanhav', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.chinhlk', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.hangpt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.longta', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.hanhba', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.tamdv', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.tranglp2', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.vumg2', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.vanht', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.vuongvt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.vyld', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.yengt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.zachs', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.anhvt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.binhlt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.cuongpm', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.duonght', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.ede', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.quynhvk', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.giaolv', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.hoangpt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.ichkt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.khanhmt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.loitt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.manhde', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.namvk', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.oipv', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.phaplh', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.quyda', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.ruoumt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.sanhvt', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.tauvk', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.uyhh2', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.vumm', @GuardianPasswordHash, 'PHU_HUYNH'),
+	('gh.tinhtht', @GuardianPasswordHash, 'PHU_HUYNH'),
 
--- Bang diem theo lop
+	-- 90 Tài khoản Học sinh (Đã thêm số thứ tự cho tên trùng)
+	('hs.anvn', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.binhtt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.chimp', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.dunght', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.emdd', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.phuckv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.gianglv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.huypt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.khoita', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.linhbx', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.minhdq', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.nghialh', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.phongmt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.quangtv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.sonlh', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.tungnv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.thutt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.trilmh', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.uyenkt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.vietdd', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.xanhnk', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.yentv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.anhtt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.bachha', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.canhdx', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.danvq', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.haileh', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.khanhpt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.lamtv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.manhbh', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.namdv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.ngoclt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.oanhmh', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.phutp', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.quyld', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.rangnk', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.sangtv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.thaohth', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.tienva', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.tramdx', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.tungnq', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.uyentht', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.vanpt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.xinhhv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.yenhd', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.anhvv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.baolt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.chaupt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.dantt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.haibd', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.hangdk', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.longlv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.lymt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.manhta', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.nhilx', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.phucnq', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.thanhth', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.trunghth', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.tuyenvv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.vietdh', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.chinv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.dungtt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.khoapm', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.lienht', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.loidde', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.maivk', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.nghiemlv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.oanhpt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.phucta', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.quangbx', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.sondq', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.thuylh', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.trangmt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.vienmt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.yenlh', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.anhnv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.bichta', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.cuongmh', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.datvt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.giangdd', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.haink', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.khoatv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.lampt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.linhha', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.minhdx', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.nganvq', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.phuonglh', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.quypt', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.sontv', @StudentPasswordHash, 'HOC_VIEN'),
+	('hs.taibh', @StudentPasswordHash, 'HOC_VIEN');
+
+-- 16. HOCSINH_LOPHOC
 INSERT INTO HOCSINH_LOPHOC (MaHocSinh, MaLopHoc, DiemThuongXuyen, DiemGiuaKy, DiemCuoiKy)
-SELECT src.MaHocSinh, src.MaLopHoc, src.DiemThuongXuyen, src.DiemGiuaKy, src.DiemCuoiKy
-FROM (VALUES
-	('HS00000001', 'LH00000001', 8.5, 6.5, 9.0),
-	('HS00000001', 'LH00000002', 8.8, 7.0, 8.5),
-	('HS00000002', 'LH00000001', 9.1, 8.0, 9.5),
-	('HS00000002', 'LH00000002', 8.4, 9.5, 8.0),
-	('HS00000003', 'LH00000003', 7.9, 8.0, 7.5),
-	('HS00000004', 'LH00000003', 8.7, 9.0, 10),
-	('HS00000005', 'LH00000004', 8.2, 9.5, 9.5),
-	('HS00000006', 'LH00000004', 9.0, 9.0, 8.5)
-) AS src (MaHocSinh, MaLopHoc, DiemThuongXuyen, DiemGiuaKy, DiemCuoiKy)
-WHERE NOT EXISTS (
-	SELECT 1
-	FROM HOCSINH_LOPHOC target
-	WHERE target.MaHocSinh = src.MaHocSinh
-		AND target.MaLopHoc = src.MaLopHoc
-);
+VALUES
+	-- 10A1
+	('HS00000001', 'LH00000001', 8.2, 7.5, 8.8),
+	('HS00000002', 'LH00000001', 7.9, 8.1, 7.2),
+	('HS00000003', 'LH00000001', 9.0, 8.5, 9.1),
+	('HS00000004', 'LH00000001', 6.5, 6.8, 7.0),
+	('HS00000005', 'LH00000001', 8.8, 8.0, 7.5),
+	('HS00000006', 'LH00000001', 7.1, 7.4, 8.5),
+	('HS00000007', 'LH00000001', 9.2, 9.0, 9.5),
+	('HS00000008', 'LH00000001', 6.0, 6.3, 6.7),
+	('HS00000009', 'LH00000001', 8.5, 8.8, 8.1),
+	('HS00000010', 'LH00000001', 7.3, 7.0, 7.9),
+	-- 10A2
+	('HS00000011', 'LH00000002', 7.8, 7.7, 8.0),
+	('HS00000012', 'LH00000002', 8.1, 8.5, 8.9),
+	('HS00000013', 'LH00000002', 9.3, 9.4, 9.2),
+	('HS00000014', 'LH00000002', 6.4, 6.0, 5.8),
+	('HS00000015', 'LH00000002', 7.6, 7.8, 8.2),
+	('HS00000016', 'LH00000002', 8.7, 8.3, 8.6),
+	('HS00000017', 'LH00000002', 9.1, 9.5, 9.0),
+	('HS00000018', 'LH00000002', 6.4, 6.6, 6.9),
+	('HS00000019', 'LH00000002', 8.3, 8.1, 8.5),
+	('HS00000020', 'LH00000002', 7.0, 7.3, 7.1),
+	-- 10A3
+	('HS00000021', 'LH00000003', 9.4, 9.0, 9.6),
+	('HS00000022', 'LH00000003', 5.8, 5.5, 5.7),
+	('HS00000023', 'LH00000003', 8.6, 8.9, 8.7),
+	('HS00000024', 'LH00000003', 7.5, 7.6, 7.8),
+	('HS00000025', 'LH00000003', 9.0, 9.2, 9.1),
+	('HS00000026', 'LH00000003', 6.7, 6.5, 6.4),
+	('HS00000027', 'LH00000003', 8.0, 8.2, 7.9),
+	('HS00000028', 'LH00000003', 7.2, 7.5, 7.0),
+	('HS00000029', 'LH00000003', 9.6, 9.7, 9.4),
+	('HS00000030', 'LH00000003', 5.9, 6.1, 6.3),
+	-- 11A1
+	('HS00000031', 'LH00000004', 8.5, 8.8, 8.9),
+	('HS00000032', 'LH00000004', 7.4, 7.1, 7.7),
+	('HS00000033', 'LH00000004', 9.8, 9.9, 9.7),
+	('HS00000034', 'LH00000004', 5.6, 5.4, 5.5),
+	('HS00000035', 'LH00000004', 8.7, 8.4, 8.6),
+	('HS00000036', 'LH00000004', 7.1, 7.2, 7.0),
+	('HS00000037', 'LH00000004', 9.2, 9.6, 9.3),
+	('HS00000038', 'LH00000004', 6.0, 6.3, 6.5),
+	('HS00000039', 'LH00000004', 8.4, 8.7, 8.5),
+	('HS00000040', 'LH00000004', 7.8, 7.5, 7.9),
+	-- 11A2
+	('HS00000041', 'LH00000005', 9.1, 9.3, 9.2),
+	('HS00000042', 'LH00000005', 6.2, 6.0, 6.1),
+	('HS00000043', 'LH00000005', 8.8, 8.5, 8.9),
+	('HS00000044', 'LH00000005', 7.9, 8.1, 7.7),
+	('HS00000045', 'LH00000005', 9.0, 9.4, 9.1),
+	('HS00000046', 'LH00000005', 6.5, 6.8, 7.0),
+	('HS00000047', 'LH00000005', 8.2, 8.0, 7.5),
+	('HS00000048', 'LH00000005', 7.1, 7.4, 8.5),
+	('HS00000049', 'LH00000005', 9.2, 9.0, 9.5),
+	('HS00000050', 'LH00000005', 6.0, 6.3, 6.7),
+	-- 11A3
+	('HS00000051', 'LH00000006', 8.5, 8.8, 8.1),
+	('HS00000052', 'LH00000006', 7.3, 7.0, 7.9),
+	('HS00000053', 'LH00000006', 8.9, 9.3, 9.0),
+	('HS00000054', 'LH00000006', 6.2, 5.9, 6.1),
+	('HS00000055', 'LH00000006', 9.5, 9.1, 9.7),
+	('HS00000056', 'LH00000006', 7.7, 8.0, 7.4),
+	('HS00000057', 'LH00000006', 8.4, 8.6, 8.3),
+	('HS00000058', 'LH00000006', 6.9, 7.2, 7.6),
+	('HS00000059', 'LH00000006', 7.8, 7.7, 8.0),
+	('HS00000060', 'LH00000006', 8.1, 8.5, 8.9),
+	-- 12A1
+	('HS00000061', 'LH00000007', 9.3, 9.4, 9.2),
+	('HS00000062', 'LH00000007', 6.4, 6.0, 5.8),
+	('HS00000063', 'LH00000007', 7.6, 7.8, 8.2),
+	('HS00000064', 'LH00000007', 8.7, 8.3, 8.6),
+	('HS00000065', 'LH00000007', 9.1, 9.5, 9.0),
+	('HS00000066', 'LH00000007', 6.4, 6.6, 6.9),
+	('HS00000067', 'LH00000007', 8.3, 8.1, 8.5),
+	('HS00000068', 'LH00000007', 7.0, 7.3, 7.1),
+	('HS00000069', 'LH00000007', 9.4, 9.0, 9.6),
+	('HS00000070', 'LH00000007', 5.8, 5.5, 5.7),
+	-- 12A2
+	('HS00000071', 'LH00000008', 8.6, 8.9, 8.7),
+	('HS00000072', 'LH00000008', 7.5, 7.6, 7.8),
+	('HS00000073', 'LH00000008', 9.0, 9.2, 9.1),
+	('HS00000074', 'LH00000008', 6.7, 6.5, 6.4),
+	('HS00000075', 'LH00000008', 8.0, 8.2, 7.9),
+	('HS00000076', 'LH00000008', 7.2, 7.5, 7.0),
+	('HS00000077', 'LH00000008', 9.6, 9.7, 9.4),
+	('HS00000078', 'LH00000008', 5.9, 6.1, 6.3),
+	('HS00000079', 'LH00000008', 8.5, 8.8, 8.9),
+	('HS00000080', 'LH00000008', 7.4, 7.1, 7.7),
+	-- 12A3
+	('HS00000081', 'LH00000009', 9.8, 9.9, 9.7),
+	('HS00000082', 'LH00000009', 5.6, 5.4, 5.5),
+	('HS00000083', 'LH00000009', 8.7, 8.4, 8.6),
+	('HS00000084', 'LH00000009', 7.1, 7.2, 7.0),
+	('HS00000085', 'LH00000009', 9.2, 9.6, 9.3),
+	('HS00000086', 'LH00000009', 6.0, 6.3, 6.5),
+	('HS00000087', 'LH00000009', 8.4, 8.7, 8.5),
+	('HS00000088', 'LH00000009', 7.8, 7.5, 7.9),
+	('HS00000089', 'LH00000009', 9.1, 9.3, 9.2),
+	('HS00000090', 'LH00000009', 6.2, 6.0, 6.1);
 
--- Tong hop hoc sinh theo nam hoc/khoi/lop
+-- 17. HOCSINH_NAMHOC_KHOI_LOPHOC
 INSERT INTO HOCSINH_NAMHOC_KHOI_LOPHOC (MaHocSinh, MaNamHoc, MaKhoi, MaLopHoc, DiemThuongXuyen, DiemGiuaKy, DiemCuoiKy)
-SELECT src.MaHocSinh, src.MaNamHoc, src.MaKhoi, src.MaLopHoc, src.DiemThuongXuyen, src.DiemGiuaKy, src.DiemCuoiKy
-FROM (VALUES
-	('HS00000001', 'NH00000001', 'KH00000001', 'LH00000001', 8.5, 6.5, 9.0),
-	('HS00000001', 'NH00000001', 'KH00000001', 'LH00000002', 8.8, 7.0, 8.5),
-	('HS00000002', 'NH00000001', 'KH00000001', 'LH00000001', 9.1, 8.0, 9.5),
-	('HS00000002', 'NH00000001', 'KH00000001', 'LH00000002', 8.4, 9.5, 8.0),
-	('HS00000003', 'NH00000001', 'KH00000002', 'LH00000003', 7.9, 8.0, 7.5),
-	('HS00000004', 'NH00000001', 'KH00000002', 'LH00000003', 8.7, 9.0, 10),
-	('HS00000005', 'NH00000001', 'KH00000003', 'LH00000004', 8.2, 9.5, 9.5),
-	('HS00000006', 'NH00000001', 'KH00000003', 'LH00000004', 9.0, 9.0, 8.5)
-) AS src (MaHocSinh, MaNamHoc, MaKhoi, MaLopHoc, DiemThuongXuyen, DiemGiuaKy, DiemCuoiKy)
-WHERE NOT EXISTS (
-	SELECT 1
-	FROM HOCSINH_NAMHOC_KHOI_LOPHOC target
-	WHERE target.MaHocSinh = src.MaHocSinh
-		AND target.MaNamHoc = src.MaNamHoc
-		AND target.MaKhoi = src.MaKhoi
-		AND target.MaLopHoc = src.MaLopHoc
-);
+VALUES
+	-- Khối 10
+	('HS00000001', 'NH00000001', 'KH00000010', 'LH00000001', 8.2, 7.5, 8.8),
+	('HS00000002', 'NH00000001', 'KH00000010', 'LH00000001', 7.9, 8.1, 7.2),
+	('HS00000003', 'NH00000001', 'KH00000010', 'LH00000001', 9.0, 8.5, 9.1),
+	('HS00000004', 'NH00000001', 'KH00000010', 'LH00000001', 6.5, 6.8, 7.0),
+	('HS00000005', 'NH00000001', 'KH00000010', 'LH00000001', 8.8, 8.0, 7.5),
+	('HS00000006', 'NH00000001', 'KH00000010', 'LH00000001', 7.1, 7.4, 8.5),
+	('HS00000007', 'NH00000001', 'KH00000010', 'LH00000001', 9.2, 9.0, 9.5),
+	('HS00000008', 'NH00000001', 'KH00000010', 'LH00000001', 6.0, 6.3, 6.7),
+	('HS00000009', 'NH00000001', 'KH00000010', 'LH00000001', 8.5, 8.8, 8.1),
+	('HS00000010', 'NH00000001', 'KH00000010', 'LH00000001', 7.3, 7.0, 7.9),
+	('HS00000011', 'NH00000001', 'KH00000010', 'LH00000002', 7.8, 7.7, 8.0),
+	('HS00000012', 'NH00000001', 'KH00000010', 'LH00000002', 8.1, 8.5, 8.9),
+	('HS00000013', 'NH00000001', 'KH00000010', 'LH00000002', 9.3, 9.4, 9.2),
+	('HS00000014', 'NH00000001', 'KH00000010', 'LH00000002', 6.4, 6.0, 5.8),
+	('HS00000015', 'NH00000001', 'KH00000010', 'LH00000002', 7.6, 7.8, 8.2),
+	('HS00000016', 'NH00000001', 'KH00000010', 'LH00000002', 8.7, 8.3, 8.6),
+	('HS00000017', 'NH00000001', 'KH00000010', 'LH00000002', 9.1, 9.5, 9.0),
+	('HS00000018', 'NH00000001', 'KH00000010', 'LH00000002', 6.4, 6.6, 6.9),
+	('HS00000019', 'NH00000001', 'KH00000010', 'LH00000002', 8.3, 8.1, 8.5),
+	('HS00000020', 'NH00000001', 'KH00000010', 'LH00000002', 7.0, 7.3, 7.1),
+	('HS00000021', 'NH00000001', 'KH00000010', 'LH00000003', 9.4, 9.0, 9.6),
+	('HS00000022', 'NH00000001', 'KH00000010', 'LH00000003', 5.8, 5.5, 5.7),
+	('HS00000023', 'NH00000001', 'KH00000010', 'LH00000003', 8.6, 8.9, 8.7),
+	('HS00000024', 'NH00000001', 'KH00000010', 'LH00000003', 7.5, 7.6, 7.8),
+	('HS00000025', 'NH00000001', 'KH00000010', 'LH00000003', 9.0, 9.2, 9.1),
+	('HS00000026', 'NH00000001', 'KH00000010', 'LH00000003', 6.7, 6.5, 6.4),
+	('HS00000027', 'NH00000001', 'KH00000010', 'LH00000003', 8.0, 8.2, 7.9),
+	('HS00000028', 'NH00000001', 'KH00000010', 'LH00000003', 7.2, 7.5, 7.0),
+	('HS00000029', 'NH00000001', 'KH00000010', 'LH00000003', 9.6, 9.7, 9.4),
+	('HS00000030', 'NH00000001', 'KH00000010', 'LH00000003', 5.9, 6.1, 6.3),
+	-- Khối 11
+	('HS00000031', 'NH00000001', 'KH00000011', 'LH00000004', 8.5, 8.8, 8.9),
+	('HS00000032', 'NH00000001', 'KH00000011', 'LH00000004', 7.4, 7.1, 7.7),
+	('HS00000033', 'NH00000001', 'KH00000011', 'LH00000004', 9.8, 9.9, 9.7),
+	('HS00000034', 'NH00000001', 'KH00000011', 'LH00000004', 5.6, 5.4, 5.5),
+	('HS00000035', 'NH00000001', 'KH00000011', 'LH00000004', 8.7, 8.4, 8.6),
+	('HS00000036', 'NH00000001', 'KH00000011', 'LH00000004', 7.1, 7.2, 7.0),
+	('HS00000037', 'NH00000001', 'KH00000011', 'LH00000004', 9.2, 9.6, 9.3),
+	('HS00000038', 'NH00000001', 'KH00000011', 'LH00000004', 6.0, 6.3, 6.5),
+	('HS00000039', 'NH00000001', 'KH00000011', 'LH00000004', 8.4, 8.7, 8.5),
+	('HS00000040', 'NH00000001', 'KH00000011', 'LH00000004', 7.8, 7.5, 7.9),
+	('HS00000041', 'NH00000001', 'KH00000011', 'LH00000005', 9.1, 9.3, 9.2),
+	('HS00000042', 'NH00000001', 'KH00000011', 'LH00000005', 6.2, 6.0, 6.1),
+	('HS00000043', 'NH00000001', 'KH00000011', 'LH00000005', 8.8, 8.5, 8.9),
+	('HS00000044', 'NH00000001', 'KH00000011', 'LH00000005', 7.9, 8.1, 7.7),
+	('HS00000045', 'NH00000001', 'KH00000011', 'LH00000005', 9.0, 9.4, 9.1),
+	('HS00000046', 'NH00000001', 'KH00000011', 'LH00000005', 6.5, 6.8, 7.0),
+	('HS00000047', 'NH00000001', 'KH00000011', 'LH00000005', 8.2, 8.0, 7.5),
+	('HS00000048', 'NH00000001', 'KH00000011', 'LH00000005', 7.1, 7.4, 8.5),
+	('HS00000049', 'NH00000001', 'KH00000011', 'LH00000005', 9.2, 9.0, 9.5),
+	('HS00000050', 'NH00000001', 'KH00000011', 'LH00000005', 6.0, 6.3, 6.7),
+	('HS00000051', 'NH00000001', 'KH00000011', 'LH00000006', 8.5, 8.8, 8.1),
+	('HS00000052', 'NH00000001', 'KH00000011', 'LH00000006', 7.3, 7.0, 7.9),
+	('HS00000053', 'NH00000001', 'KH00000011', 'LH00000006', 8.9, 9.3, 9.0),
+	('HS00000054', 'NH00000001', 'KH00000011', 'LH00000006', 6.2, 5.9, 6.1),
+	('HS00000055', 'NH00000001', 'KH00000011', 'LH00000006', 9.5, 9.1, 9.7),
+	('HS00000056', 'NH00000001', 'KH00000011', 'LH00000006', 7.7, 8.0, 7.4),
+	('HS00000057', 'NH00000001', 'KH00000011', 'LH00000006', 8.4, 8.6, 8.3),
+	('HS00000058', 'NH00000001', 'KH00000011', 'LH00000006', 6.9, 7.2, 7.6),
+	('HS00000059', 'NH00000001', 'KH00000011', 'LH00000006', 7.8, 7.7, 8.0),
+	('HS00000060', 'NH00000001', 'KH00000011', 'LH00000006', 8.1, 8.5, 8.9),
+	-- Khối 12
+	('HS00000061', 'NH00000001', 'KH00000012', 'LH00000007', 9.3, 9.4, 9.2),
+	('HS00000062', 'NH00000001', 'KH00000012', 'LH00000007', 6.4, 6.0, 5.8),
+	('HS00000063', 'NH00000001', 'KH00000012', 'LH00000007', 7.6, 7.8, 8.2),
+	('HS00000064', 'NH00000001', 'KH00000012', 'LH00000007', 8.7, 8.3, 8.6),
+	('HS00000065', 'NH00000001', 'KH00000012', 'LH00000007', 9.1, 9.5, 9.0),
+	('HS00000066', 'NH00000001', 'KH00000012', 'LH00000007', 6.4, 6.6, 6.9),
+	('HS00000067', 'NH00000001', 'KH00000012', 'LH00000007', 8.3, 8.1, 8.5),
+	('HS00000068', 'NH00000001', 'KH00000012', 'LH00000007', 7.0, 7.3, 7.1),
+	('HS00000069', 'NH00000001', 'KH00000012', 'LH00000007', 9.4, 9.0, 9.6),
+	('HS00000070', 'NH00000001', 'KH00000012', 'LH00000007', 5.8, 5.5, 5.7),
+	('HS00000071', 'NH00000001', 'KH00000012', 'LH00000008', 8.6, 8.9, 8.7),
+	('HS00000072', 'NH00000001', 'KH00000012', 'LH00000008', 7.5, 7.6, 7.8),
+	('HS00000073', 'NH00000001', 'KH00000012', 'LH00000008', 9.0, 9.2, 9.1),
+	('HS00000074', 'NH00000001', 'KH00000012', 'LH00000008', 6.7, 6.5, 6.4),
+	('HS00000075', 'NH00000001', 'KH00000012', 'LH00000008', 8.0, 8.2, 7.9),
+	('HS00000076', 'NH00000001', 'KH00000012', 'LH00000008', 7.2, 7.5, 7.0),
+	('HS00000077', 'NH00000001', 'KH00000012', 'LH00000008', 9.6, 9.7, 9.4),
+	('HS00000078', 'NH00000001', 'KH00000012', 'LH00000008', 5.9, 6.1, 6.3),
+	('HS00000079', 'NH00000001', 'KH00000012', 'LH00000008', 8.5, 8.8, 8.9),
+	('HS00000080', 'NH00000001', 'KH00000012', 'LH00000008', 7.4, 7.1, 7.7),
+	('HS00000081', 'NH00000001', 'KH00000012', 'LH00000009', 9.8, 9.9, 9.7),
+	('HS00000082', 'NH00000001', 'KH00000012', 'LH00000009', 5.6, 5.4, 5.5),
+	('HS00000083', 'NH00000001', 'KH00000012', 'LH00000009', 8.7, 8.4, 8.6),
+	('HS00000084', 'NH00000001', 'KH00000012', 'LH00000009', 7.1, 7.2, 7.0),
+	('HS00000085', 'NH00000001', 'KH00000012', 'LH00000009', 9.2, 9.6, 9.3),
+	('HS00000086', 'NH00000001', 'KH00000012', 'LH00000009', 6.0, 6.3, 6.5),
+	('HS00000087', 'NH00000001', 'KH00000012', 'LH00000009', 8.4, 8.7, 8.5),
+	('HS00000088', 'NH00000001', 'KH00000012', 'LH00000009', 7.8, 7.5, 7.9),
+	('HS00000089', 'NH00000001', 'KH00000012', 'LH00000009', 9.1, 9.3, 9.2),
+	('HS00000090', 'NH00000001', 'KH00000012', 'LH00000009', 6.2, 6.0, 6.1);
+
+-- 18. Lịch học
+INSERT INTO LICH_HOC (MaLichHoc, MaLopHoc, Thu, TietBatDau, TietKetThuc, MaPhongHoc)
+VALUES
+	('LHOC000001', 'LH00000001', 2, 'TH00000001', 'TH00000002', 'PH00000001'),
+	('LHOC000002', 'LH00000001', 4, 'TH00000003', 'TH00000004', 'PH00000001'),
+	('LHOC000003', 'LH00000002', 2, 'TH00000003', 'TH00000004', 'PH00000002'),
+	('LHOC000004', 'LH00000002', 5, 'TH00000001', 'TH00000002', 'PH00000002'),
+	('LHOC000005', 'LH00000003', 3, 'TH00000001', 'TH00000002', 'PH00000003'),
+	('LHOC000006', 'LH00000003', 6, 'TH00000003', 'TH00000004', 'PH00000003'),
+	('LHOC000007', 'LH00000004', 3, 'TH00000003', 'TH00000004', 'PH00000004'),
+	('LHOC000008', 'LH00000004', 5, 'TH00000005', 'TH00000006', 'PH00000004'),
+	('LHOC000009', 'LH00000005', 4, 'TH00000001', 'TH00000002', 'PH00000005'),
+	('LHOC000010', 'LH00000005', 6, 'TH00000007', 'TH00000008', 'PH00000005'),
+	('LHOC000011', 'LH00000006', 5, 'TH00000003', 'TH00000004', 'PH00000006'),
+	('LHOC000012', 'LH00000006', 7, 'TH00000001', 'TH00000002', 'PH00000006'),
+	('LHOC000013', 'LH00000007', 2, 'TH00000007', 'TH00000008', 'PH00000007'),
+	('LHOC000014', 'LH00000007', 4, 'TH00000005', 'TH00000006', 'PH00000007'),
+	('LHOC000015', 'LH00000008', 3, 'TH00000007', 'TH00000008', 'PH00000008'),
+	('LHOC000016', 'LH00000008', 6, 'TH00000001', 'TH00000002', 'PH00000008'),
+	('LHOC000017', 'LH00000009', 4, 'TH00000007', 'TH00000008', 'PH00000009'),
+	('LHOC000018', 'LH00000009', 7, 'TH00000003', 'TH00000004', 'PH00000009');

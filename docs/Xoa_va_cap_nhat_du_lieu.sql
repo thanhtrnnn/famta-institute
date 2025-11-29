@@ -10,7 +10,7 @@ WHERE MaLopHoc = 'LH00000001'
 
 -- Cập nhật điểm cho học sinh
 UPDATE HOCSINH_LOPHOC
-SET DiemSo = 9.0
+SET DiemThuongXuyen = 9.0
 WHERE MaHocSinh = 'HS00000001' AND MaLopHoc = 'LH00000001';
 
 -- Xoá học sinh khỏi lớp học

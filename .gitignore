@@ -105,3 +105,4 @@ Desktop.ini
 /logs/
 /data/
 /config/database.properties
+application.properties

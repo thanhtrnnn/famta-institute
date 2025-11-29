@@ -68,7 +68,7 @@ public class HocSinh extends NguoiDung {
     }
 
     public void dangKyLopHoc(LopHoc lopHoc, Khoi khoi) {
-    new DangKyHoc(this, Objects.requireNonNull(lopHoc, "lopHoc"), Objects.requireNonNull(khoi, "khoi"));
+        new DangKyHoc(this, Objects.requireNonNull(lopHoc, "lopHoc"), Objects.requireNonNull(khoi, "khoi"));
     }
 
     public List<DangKyHoc> layBangDiem() {

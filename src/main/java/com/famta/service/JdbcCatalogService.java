@@ -235,16 +235,14 @@ public class JdbcCatalogService {
     // --- PHONGHOC ---
     public List<PhongHoc> getAllPhongHoc() throws SQLException {
         List<PhongHoc> list = new ArrayList<>();
-        String sql = "SELECT p.*, l.TenLoaiPhongHoc FROM PHONGHOC p LEFT JOIN LOAIPHONGHOC l ON p.MaLoaiPhongHoc = l.MaLoaiPhongHoc ORDER BY p.MaPhongHoc";
+        String sql = "SELECT p.* FROM PHONGHOC p ORDER BY p.MaPhongHoc";
         try (Statement stmt = getConnection().createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 PhongHoc ph = new PhongHoc(
-                    rs.getString("MaPhongHoc"),
-                    rs.getString("TenPhongHoc"),
-                    rs.getString("MaLoaiPhongHoc"),
-                    rs.getString("TenLoaiPhongHoc")
-                );
+                        rs.getString("MaPhongHoc"),
+                        rs.getString("TenPhongHoc"),
+                        rs.getString("MaLoaiPhongHoc"));
                 list.add(ph);
             }
         }

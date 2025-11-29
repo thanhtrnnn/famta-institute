@@ -53,6 +53,10 @@ FAMTA Institute Management System là một giải pháp phần mềm toàn di�
 
 ## Kiến trúc Ứng dụng
 
+Hệ thống tuân theo mô hình **MVC (Model-View-Controller)**, đảm bảo sự phân tách rõ ràng giữa giao diện, logic và dữ liệu.
+
+### Sơ đồ Kiến trúc
+
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │                      PRESENTATION LAYER                          │
@@ -63,38 +67,43 @@ FAMTA Institute Management System là một giải pháp phần mềm toàn di�
 └──────────────────────────────┼───────────────────────────────────┘
                                │
 ┌──────────────────────────────▼───────────────────────────────────┐
-│                        SERVICE LAYER                             │
-│  ┌────────────────────────────────────────────────────────────┐  │
-│  │  • AuthService: Xác thực đăng nhập người dùng              │  │
-│  │  • DashboardService: Tổng hợp số liệu thống kê tổng quan   │  │
-│  │  • ScoreService: Tra cứu và cập nhật điểm theo lớp         │  │
-│  │  • CatalogService: CRUD danh mục (Năm học, Khoa, Môn, ...) │  │
-│  │  • ClassService: Quản lý lớp học và thời khóa biểu         │  │
-│  │  • GuardianService: Quản lý thông tin phụ huynh            │  │
-│  │  • ReportService: Tạo báo cáo và phân tích điểm số         │  │
-│  │  • AccountAdminService: Quản trị tài khoản hệ thống        │  │
-│  └───────────────────────────┬────────────────────────────────┘  │
-└──────────────────────────────┼───────────────────────────────────┘
-                               │
-┌──────────────────────────────▼───────────────────────────────────┐
-│                      DATA ACCESS LAYER                           │
-│  ┌────────────────────────────────────────────────────────────┐  │
-│  │              JDBC Repositories (JDBC Queries)              │  │
-│  └───────────────────────────┬────────────────────────────────┘  │
-│                              │                                   │
-│  ┌───────────────────────────▼────────────────────────────────┐  │
-│  │              DatabaseManager (Connection Pool)             │  │
-│  └───────────────────────────┬────────────────────────────────┘  │
-└──────────────────────────────┼───────────────────────────────────┘
-                               │
-┌──────────────────────────────▼───────────────────────────────────┐
-│                   MODEL/ ENTITY (POJO Classes)                   │
-└──────────────────────────────┼───────────────────────────────────┘
-                               │
-┌──────────────────────────────▼───────────────────────────────────┐
+│                 BUSINESS & DATA ACCESS LAYER                     │
+│  ┌───────────────────────────┐  ┌─────────────────────────────┐  │
+│  │    Service Interfaces     │◄─┤    JDBC Implementations     │  │
+│  │    (Contracts)            │  │    (Logic & SQL Queries)    │  │
+│  └───────────────────────────┘  └──────────────┬──────────────┘  │
+└────────────────────────────────────────────────┼─────────────────┘
+                                                 │
+                                  ┌──────────────▼──────────────┐
+                                  │      DatabaseManager        │
+                                  │      (Connection Pool)      │
+                                  └──────────────┬──────────────┘
+                                                 │
+┌────────────────────────────────────────────────▼─────────────────┐
 │                       SQL SERVER DATABASE                        │
 └──────────────────────────────────────────────────────────────────┘
 ```
+
+### Các thành phần chính
+
+1. **Presentation Layer (View & Controller)**
+   - **FXML**: Định nghĩa cấu trúc giao diện người dùng.
+   - **CSS**: Định nghĩa giao diện và chủ đề (Theme).
+   - **Controller**: Xử lý sự kiện từ người dùng, điều hướng và cập nhật View.
+
+2. **Business Logic & Data Access Layer (Service)**
+   - Nằm trong `com.famta.service`.
+   - Kết hợp logic nghiệp vụ và truy cập dữ liệu (DAO pattern).
+   - **Interfaces**: Định nghĩa các chức năng (ví dụ: `ScoreService`).
+   - **Implementations**: Thực thi các truy vấn JDBC trực tiếp (ví dụ: `JdbcScoreService`).
+
+3. **Domain Model**
+   - Các lớp POJO trong `com.famta.model` đại diện cho các thực thể.
+
+4. **Infrastructure**
+   - **DatabaseManager**: Singleton quản lý kết nối đến SQL Server.
+   - **UserSession**: Quản lý trạng thái đăng nhập.
+   - **SecurityContext**: Kiểm soát phân quyền (Role-based Access Control).
 
 ## Cài đặt và Chạy ứng dụng
 
@@ -105,18 +114,58 @@ cd famta-institute
 ```
 
 ### 2. Cấu hình Database
-Dự án sử dụng **Microsoft SQL Server**. Bạn cần:
-1. Cài đặt SQL Server 2019 hoặc mới hơn.
-2. Tạo database mới và chạy các script truy vấn SQL trong thư mục `docs/`:
-   - `docs/Tao_bang.sql`: Tạo cấu trúc bảng.
-   - `docs/Nhap_du_lieu.sql`: Thêm dữ liệu mẫu.
-3. Cập nhật thông tin kết nối trong file `src/main/resources/config/application.properties`:
+Dự án sử dụng **Microsoft SQL Server**. Bạn cần thực hiện các bước sau để thiết lập môi trường cơ sở dữ liệu. Hướng dẫn này dành cho người dùng Windows.
+
+#### Bước 1: Cài đặt và Cấu hình SQL Server
+1. **Cài đặt SQL Server**<br>
+Tải và cài đặt SQL Server 2019 (hoặc phiên bản mới hơn) từ [trang chủ Microsoft](https://www.microsoft.com/en-us/sql-server/sql-server-downloads). Trong quá trình cài đặt, hãy chọn **Mixed Mode Authentication** để hỗ trợ đăng nhập bằng cả tài khoản Windows và tài khoản SQL Server (sa).
+
+2. **Kiểm tra cổng (Port)**
+   - Mở Command Prompt (cmd) hoặc PowerShell và chạy lệnh:
+     ```bash
+     netstat -ano | findstr :1433
+     ```
+   - Nếu cổng 1433 chưa bị chiếm (không có kết quả trả về), bạn có thể sử dụng cổng mặc định này.
+   - Nếu cổng đã bị chiếm, hãy chọn một cổng khác chưa sử dụng (ví dụ: 1434).
+
+3. **Cấu hình TCP/IP**
+   - Mở **SQL Server Configuration Manager** (Tìm kiếm trong Windows hoặc mở Run > `SQLServerManager15.msc` cho bản 2019, `SQLServerManager16.msc` cho bản 2022).
+   - Mở rộng mục **SQL Server Network Configuration**.
+   - Chọn **Protocols for <your_instance_name>**.
+   - Chuột phải vào **TCP/IP** và chọn **Enable**.
+   - Chuột phải vào **TCP/IP** lần nữa, chọn **Properties**, chuyển sang tab **IP Addresses**. Kéo xuống phần **IPAll**, đặt **TCP Port** thành `1433` (hoặc cổng bạn đã chọn ở bước trên).
+   - Sau khi thay đổi, vào mục **SQL Server Services**, chuột phải vào **SQL Server (<your_instance_name>)** và chọn **Restart** để áp dụng.
+
+4. **Tạo tài khoản đăng nhập (Login)**
+   - Mở **SQL Server Management Studio (SSMS)** và kết nối bằng Windows Authentication.
+   - Trong Object Explorer, mở rộng **Security** > **Logins**.
+   - Chuột phải vào **Logins** > **New Login...**.
+   - Nhập **Login name** (ví dụ: `famta_user`), chọn **SQL Server authentication**, và nhập mật khẩu.
+   - Trong trang **Server Roles**, tích chọn `sysadmin` (để cấp quyền đầy đủ cho môi trường dev) hoặc cấu hình quyền hạn hẹp hơn tùy nhu cầu.
+   - Nhấn **OK** để tạo.
+
+#### Bước 2: Tạo Database và Dữ liệu mẫu
+1. Mở SSMS, ngắt kết nối hiện tại và kết nối lại bằng **SQL Server Authentication** với tài khoản vừa tạo.
+2. Mở file `docs/Tao_bang.sql` trong SSMS và nhấn **Execute** (F5) để tạo cấu trúc bảng.
+3. Mở file `docs/Nhap_du_lieu.sql` và nhấn **Execute** (F5) để thêm dữ liệu mẫu.
+
+#### Bước 3: Kiểm tra kết nối
+Mở terminal và chạy lệnh sau để kiểm tra kết nối đến database (thay thế `<username>`, `<password>` và cổng `1433` nếu cần):
+
+```bash
+sqlcmd -S tcp:localhost,1433 -U <username> -P <password> -d FAMTAInstitute -Q "SELECT CURRENT_USER"
+```
+Nếu kết quả trả về tên người dùng hiện tại, kết nối đã thành công.
+
+#### Bước 4: Cập nhật cấu hình ứng dụng
+Cập nhật thông tin kết nối trong file `src/main/resources/config/application.properties`:
    ```properties
    db.url=jdbc:sqlserver://localhost:1433;databaseName=FAMTAInstitute;encrypt=true;trustServerCertificate=true
    database.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
-   db.username=your_username
-   db.password=your_password
+   db.username=<your_username>
+   db.password=<your_password>
    ```
+   Tham khảo file `example.application.properties` để biết thêm cấu hình mẫu.
 
 ### 3. Build và Chạy
 Sử dụng Maven để build và chạy ứng dụng:
